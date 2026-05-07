@@ -99,23 +99,29 @@ const MyOrders = () => {
     if (!orderToCancel) return
 
     try {
-      // Menggunakan API untuk membatalkan pesanan
-      await transactionService.updateTransactionStatus(orderToCancel.id, 'canceled')
-      toast.success('Pesanan berhasil dibatalkan')
+      if (cancelType === 'simple') {
+        // Jika belum bayar, hapus saja dari data
+        await transactionService.deleteTransaction(orderToCancel.id)
+        toast.success('Pesanan berhasil dihapus')
+      } else {
+        // Jika sudah bayar, ubah status jadi canceled agar masuk tab Ditolak
+        await transactionService.updateTransactionStatus(orderToCancel.id, 'canceled')
+        toast.success('Pesanan berhasil dibatalkan')
+      }
       loadOrders()
     } catch (error) {
       console.error(error)
-      toast.error('Gagal membatalkan pesanan')
+      toast.error('Gagal memproses pembatalan')
     } finally {
       setIsCancelModalOpen(false)
       setOrderToCancel(null)
     }
   }
 
-  const confirmSelesaikanPesanan = () => {
+  const confirmSelesaikanPesanan = async () => {
     if (selectedOrderIdToComplete) {
       try {
-        transactionService.markAsCompleted(selectedOrderIdToComplete)
+        await transactionService.markAsCompleted(selectedOrderIdToComplete)
         toast.success('Pesanan selesai! Terima kasih.')
         loadOrders()
       } catch (error) {

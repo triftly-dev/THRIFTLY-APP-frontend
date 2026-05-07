@@ -157,11 +157,9 @@ export const transactionService = {
     return transactions[index]
   },
 
-  deleteTransaction(id) {
-    const transactions = this.getAllTransactions()
-    const filtered = transactions.filter(transaction => transaction.id !== id)
-    storage.set(STORAGE_KEYS.TRANSACTIONS, filtered)
-    return true
+  async deleteTransaction(id) {
+    const response = await api.delete(`/transactions/${id}`)
+    return response.data
   },
 
   getReturTransactions() {
