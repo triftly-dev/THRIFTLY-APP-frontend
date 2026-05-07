@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Package, Clock, CheckCircle2, AlertCircle, ShoppingBag, Truck, XCircle, TrendingUp } from 'lucide-react'
 import Header from '../../components/layout/Header'
 import Footer from '../../components/layout/Footer'
@@ -14,6 +15,7 @@ import { formatCurrency, formatDate } from '../../utils/helpers'
 import toast from 'react-hot-toast'
 
 const SellerOrders = () => {
+  const navigate = useNavigate()
   const { user } = useAuth()
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
@@ -229,7 +231,7 @@ const SellerOrders = () => {
                   )}
 
                   <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
-                    <Button variant="outline" onClick={() => window.location.href = `/chat?product=${order.productId}&user=${order.buyerId}`}>
+                    <Button variant="outline" onClick={() => navigate(`/chat?product=${order.product_id}&user=${order.buyer_id}`)}>
                       Chat Pembeli
                     </Button>
                     

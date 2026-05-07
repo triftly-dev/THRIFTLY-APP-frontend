@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Package, Clock, CheckCircle2, AlertCircle, ShoppingBag } from 'lucide-react'
 import Header from '../../components/layout/Header'
 import Footer from '../../components/layout/Footer'
@@ -14,6 +15,7 @@ import { formatCurrency, formatDate } from '../../utils/helpers'
 import toast from 'react-hot-toast'
 
 const MyOrders = () => {
+  const navigate = useNavigate()
   const { user } = useAuth()
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
@@ -243,7 +245,7 @@ const MyOrders = () => {
                     <Button variant="outline" size="sm" onClick={() => handleShowDetail(order)}>
                       Detail
                     </Button>
-                    <Button variant="outline" size="sm" onClick={() => window.location.href = `/chat?product=${order.productId}&user=${order.sellerId}`}>
+                    <Button variant="outline" size="sm" onClick={() => navigate(`/chat?product=${order.product_id}&user=${order.seller_id}`)}>
                       Chat
                     </Button>
                     
