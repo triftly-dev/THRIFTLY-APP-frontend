@@ -22,7 +22,7 @@ const EditProduct = () => {
   const [loading, setLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   
-  const { images, setImages, handleImageUpload, removeImage, isUploading } = useImageUpload(5)
+  const { images, setImages, handleImageUpload, removeImage, isUploading } = useImageUpload({ maxFiles: 5 })
   const categories = getCategories()
 
   const [formData, setFormData] = useState({
@@ -100,7 +100,7 @@ const EditProduct = () => {
         fotos: images,
       }
 
-      productService.updateProduct(id, updates)
+      await productService.updateProduct(id, updates)
       toast.success('Produk berhasil diupdate!')
       navigate('/toko/produk')
     } catch (error) {

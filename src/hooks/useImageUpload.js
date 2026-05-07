@@ -8,10 +8,12 @@ export const useImageUpload = (options = {}) => {
   const [images, setImages] = useState([])
   const [loading, setLoading] = useState(false)
 
-  const handleImageUpload = async (files) => {
+  const handleImageUpload = async (e) => {
     setLoading(true)
     
     try {
+      // Handle both direct FileList or Event object
+      const files = e.target ? e.target.files : e;
       const fileArray = Array.from(files)
       
       const validation = validateMultipleFiles(fileArray, minFiles, maxFiles)
@@ -27,7 +29,7 @@ export const useImageUpload = (options = {}) => {
         const reader = new FileReader()
         
         const base64 = await new Promise((resolve, reject) => {
-          reader.onload = (e) => resolve(e.target.result)
+          reader.onload = (event) => resolve(event.target.result)
           reader.onerror = reject
           reader.readAsDataURL(file)
         })
@@ -40,7 +42,8 @@ export const useImageUpload = (options = {}) => {
         processedImages.push(finalImage)
       }
 
-      setImages(processedImages)
+      // Gabungkan dengan gambar yang sudah ada (khusus untuk edit)
+      setImages(prev => [...prev, ...processedImages].slice(0, maxFiles))
       setLoading(false)
       return { success: true, images: processedImages }
     } catch (error) {
@@ -52,7 +55,7 @@ export const useImageUpload = (options = {}) => {
   }
 
   const removeImage = (index) => {
-    setImages(images.filter((_, i) => i !== index))
+    setImages(prev => prev.filter((_, i) => i !== index))
   }
 
   const clearImages = () => {
@@ -62,6 +65,7 @@ export const useImageUpload = (options = {}) => {
   return {
     images,
     loading,
+    isUploading: loading,
     handleImageUpload,
     removeImage,
     clearImages,
