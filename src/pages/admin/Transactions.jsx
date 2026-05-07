@@ -9,7 +9,16 @@ const Transactions = () => {
   const [transactions, setTransactions] = useState([])
 
   useEffect(() => {
-    setTransactions(transactionService.getAllTransactions() || [])
+    const loadTransactions = async () => {
+      try {
+        const data = await transactionService.getAdminTransactions()
+        setTransactions(data || [])
+      } catch (error) {
+        console.error('Failed to load transactions:', error)
+        setTransactions([])
+      }
+    }
+    loadTransactions()
   }, [])
 
   const getStatusBadge = (status) => {
@@ -31,24 +40,24 @@ const Transactions = () => {
   const columns = [
     {
       header: 'TRX ID',
-      accessor: 'id',
+      accessor: 'order_id',
       className: 'font-mono text-xs text-gray-500',
-      render: (row) => row.id.substring(0, 8).toUpperCase()
+      render: (row) => String(row.order_id || row.id).substring(0, 15).toUpperCase()
     },
     {
       header: 'Date',
-      accessor: 'createdAt',
-      render: (row) => <span className="text-gray-600">{formatDate(row.createdAt)}</span>
+      accessor: 'created_at',
+      render: (row) => <span className="text-gray-600">{formatDate(row.created_at || row.createdAt)}</span>
     },
     {
       header: 'Amount',
-      accessor: 'hargaFinal',
-      render: (row) => <span className="font-medium text-gray-900">{formatCurrency(row.hargaFinal)}</span>
+      accessor: 'harga_final',
+      render: (row) => <span className="font-medium text-gray-900">{formatCurrency(row.harga_final || row.hargaFinal)}</span>
     },
     {
       header: 'Shipping',
-      accessor: 'ongkirDitanggung',
-      render: (row) => <span className="capitalize text-gray-600">{row.ongkirDitanggung}</span>
+      accessor: 'ongkir',
+      render: (row) => <span className="capitalize text-gray-600">{formatCurrency(row.ongkir || 0)}</span>
     },
     {
       header: 'Status',

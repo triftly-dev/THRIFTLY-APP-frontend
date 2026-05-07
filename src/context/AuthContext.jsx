@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, useMemo } from 'react'
 import api from '../services/api'
 import toast from 'react-hot-toast'
 import { SUCCESS, ERRORS } from '../constants/copywriting'
@@ -110,7 +110,7 @@ export const AuthProvider = ({ children }) => {
   }
   const refreshUser = async () => { /* TODO */ }
 
-  const value = {
+  const value = useMemo(() => ({
     user,
     loading,
     login,
@@ -125,7 +125,7 @@ export const AuthProvider = ({ children }) => {
     isSeller: !!user && viewMode === 'seller',
     isBuyer: !!user && viewMode === 'buyer',
     isAdmin: user?.role === 'admin'
-  }
+  }), [user, loading, viewMode])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

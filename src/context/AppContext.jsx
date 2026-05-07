@@ -39,11 +39,11 @@ export const AppProvider = ({ children }) => {
     }
   }, [])
 
-  const refreshUnreadCount = useCallback(() => {
+  const refreshUnreadCount = useCallback(async () => {
     // Tambahkan pengecekan user.id agar tidak error saat logout
     if (user && user.id) {
       try {
-        const count = messageService.getUnreadCount(user.id)
+        const count = await messageService.getUnreadCount()
         setUnreadCount(count)
       } catch (error) {
         console.error("Gagal refresh unread count:", error)
@@ -51,7 +51,7 @@ export const AppProvider = ({ children }) => {
     } else {
       setUnreadCount(0)
     }
-  }, [user])
+  }, [user?.id])
 
   // Load produk saat pertama kali aplikasi jalan
   useEffect(() => {
@@ -68,7 +68,7 @@ export const AppProvider = ({ children }) => {
     }, 5000)
 
     return () => clearInterval(interval)
-  }, [user, refreshUnreadCount])
+  }, [user?.id, refreshUnreadCount])
 
   const value = {
     products,

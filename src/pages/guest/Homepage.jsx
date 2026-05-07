@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Search, ArrowRight, ChevronRight, Zap } from 'lucide-react'
 import Header from '../../components/layout/Header'
@@ -6,39 +6,52 @@ import Footer from '../../components/layout/Footer'
 import Container from '../../components/layout/Container'
 import ProductCard from '../../components/common/ProductCard'
 import Button from '../../components/common/Button'
-import { productService } from '../../services/productService'
 import { getCategories } from '../../constants/categories'
 import { SECTIONS, PLACEHOLDERS } from '../../constants/copywriting'
 import FullPageLoader from '../../components/common/FullPageLoader'
+import { newsletterService } from '../../services/newsletterService'
+import { toast } from 'react-hot-toast'
+import { useApp } from '../../context/AppContext'
 
 const Homepage = () => {
   const navigate = useNavigate()
-  const [buProducts, setBuProducts] = useState([])
-  const [latestProducts, setLatestProducts] = useState([])
+  const { products, loading } = useApp()
   const [searchQuery, setSearchQuery] = useState('')
-  const [loading, setLoading] = useState(true)
+  const [newsletterEmail, setNewsletterEmail] = useState('')
+  const [subscribing, setSubscribing] = useState(false)
   const categories = getCategories()
 
-  useEffect(() => {
-    const fetchHomeData = async () => {
-      try {
-        const buData = await productService.getBUProducts()
-        const latestData = await productService.getLatestProducts(8)
-        setBuProducts(buData.slice(0, 4))
-        setLatestProducts(latestData)
-      } catch (error) {
-        console.error('Gagal mengambil data produk:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchHomeData()
-  }, [])
+  // Ambil produk BU dari data global
+  const buProducts = useMemo(() => {
+    return products.filter(p => p.isBU).slice(0, 4)
+  }, [products])
+
+  // Ambil produk terbaru dari data global
+  const latestProducts = useMemo(() => {
+    return products.slice(0, 8)
+  }, [products])
 
   const handleSearch = (e) => {
     e.preventDefault()
     if (searchQuery.trim()) {
       navigate(`/products?search=${encodeURIComponent(searchQuery)}`)
+    }
+  }
+
+  const handleNewsletterSubscribe = async (e) => {
+    e.preventDefault()
+    if (!newsletterEmail) return
+
+    setSubscribing(true)
+    try {
+      await newsletterService.subscribe(newsletterEmail)
+      alert('Berhasil berlangganan newsletter!')
+      setNewsletterEmail('')
+    } catch (error) {
+      console.error('Newsletter error:', error)
+      alert(error.response?.data?.message || 'Gagal berlangganan. Silakan coba lagi.')
+    } finally {
+      setSubscribing(false)
     }
   }
 
@@ -165,16 +178,24 @@ const Homepage = () => {
             Langganan newsletter kita biar nggak ketinggalan update barang-barang premium yang baru masuk.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+          <form onSubmit={handleNewsletterSubscribe} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
             <input 
               type="email" 
+              required
+              value={newsletterEmail}
+              onChange={(e) => setNewsletterEmail(e.target.value)}
               placeholder="Masukin email kamu" 
               className="flex-1 px-5 py-3.5 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
             />
-            <Button size="lg" className="rounded-xl whitespace-nowrap">
-              Gas Langganan
+            <Button 
+              type="submit"
+              size="lg" 
+              disabled={subscribing}
+              className="rounded-xl whitespace-nowrap"
+            >
+              {subscribing ? 'Mengirim...' : 'Gas Langganan'}
             </Button>
-          </div>
+          </form>
         </div>
       </section>
 

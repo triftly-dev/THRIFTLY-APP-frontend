@@ -11,6 +11,7 @@ import { useAuth } from '../../context/AuthContext'
 import { productService } from '../../services/productService'
 import { userService } from '../../services/userService'
 import { transactionService } from '../../services/transactionService'
+import api from '../../services/api'
 import { formatCurrency } from '../../utils/helpers'
 
 const Checkout = () => {
@@ -36,6 +37,8 @@ const Checkout = () => {
     cargo: 35000
   }
 
+  // Midtrans Snap script loading removed for Custom UI / Core API integration.
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -56,8 +59,6 @@ const Checkout = () => {
         }
 
         setProduct(p)
-        
-        // Langsung gunakan data seller dari objek produk (stop error 403)
         setSeller(p.seller)
       } catch (error) {
         toast.error('Gagal memuat data')
@@ -79,43 +80,30 @@ const Checkout = () => {
     setIsSubmitting(true)
     
     try {
-      const ongkir = ongkirDitanggung === 'buyer' ? shippingRates[shippingOption] : 0
-      
-      const transaction = await transactionService.createTransaction({
-        productId: product.id,
-        buyerId: user.id,
-        sellerId: product.sellerId || product.user_id,
-        hargaFinal: product.harga,
-        ongkir: ongkir,
-        ongkirDitanggung: ongkirDitanggung,
-        alamatPengiriman: userAddress
-      })
+      // 1. Panggil Backend menggunakan Core API (Charge)
+      // Kita kirim 'bank' sesuai pilihan user. Sementara default 'bca' jika pilih transfer_bank
+      const response = await api.post('/payment/charge', {
+        product_id: product.id,
+        price: totalPembayaran,
+        bank: paymentMethod === 'transfer_bank' ? 'bca' : paymentMethod, // sesuaikan mappingnya
+        seller_id: seller?.id || product.user_id,
+        alamat_pengiriman: user.alamat || user.profile?.alamat,
+        ongkir: ongkir
+      });
 
-      setTransactionData(transaction)
-      setShowPaymentModal(true)
-      setIsSubmitting(false)
+      if (response.data.success) {
+        toast.success('Pemesanan Berhasil! Silakan selesaikan pembayaran.');
+        // 2. Langsung arahkan ke halaman Invoice buatan kita
+        navigate(`/payment/success/${response.data.data.order_id}`);
+      } else {
+        throw new Error(response.data.message || 'Gagal memproses pembayaran');
+      }
       
     } catch (error) {
-      toast.error(error.message || 'Gagal membuat pesanan')
-      setIsSubmitting(false)
+      console.error(error);
+      toast.error(error.response?.data?.error || 'Gagal terhubung ke server pembayaran');
+      setIsSubmitting(false);
     }
-  }
-
-  const handleConfirmPayment = () => {
-    if (transactionData) {
-      setIsSubmitting(true)
-      setTimeout(() => {
-        transactionService.markAsPaid(transactionData.id)
-        toast.success('Pembayaran berhasil! Pesanan sedang diproses.')
-        setShowPaymentModal(false)
-        navigate('/buyer/orders')
-      }, 1500)
-    }
-  }
-
-  const handleCopyVA = () => {
-    navigator.clipboard.writeText('8077123456789012')
-    toast.success('Nomor VA berhasil disalin')
   }
 
   if (loading || !product) {
@@ -346,90 +334,6 @@ const Checkout = () => {
       </main>
 
       <Footer />
-
-      {/* Payment Modal */}
-      <Modal
-        isOpen={showPaymentModal}
-        onClose={() => {}} // Prevent closing by clicking outside to force action
-        title="Pembayaran"
-      >
-        <div className="space-y-6">
-          <div className="text-center">
-            <p className="text-sm text-gray-500 mb-1">Total Pembayaran</p>
-            <p className="text-3xl font-bold text-primary-700">{formatCurrency(totalPembayaran)}</p>
-            <p className="text-xs text-gray-400 mt-2">Order ID: {transactionData?.id}</p>
-          </div>
-
-          <div className="border-t border-b border-gray-100 py-4">
-            {paymentMethod === 'transfer_bank' ? (
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 font-bold text-sm">BCA</div>
-                  <div>
-                    <p className="font-semibold text-gray-900">Bank BCA</p>
-                    <p className="text-sm text-gray-500">BCA Virtual Account</p>
-                  </div>
-                </div>
-                
-                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
-                  <p className="text-sm text-gray-500 mb-1">Nomor Virtual Account</p>
-                  <div className="flex items-center justify-between">
-                    <p className="text-xl font-mono font-bold text-gray-900 tracking-wider">8077 1234 5678 9012</p>
-                    <button 
-                      onClick={handleCopyVA}
-                      className="text-primary-600 hover:text-primary-700 flex items-center gap-1 text-sm font-medium"
-                    >
-                      <Copy size={16} /> Salin
-                    </button>
-                  </div>
-                </div>
-                <p className="text-xs text-gray-500 text-center">
-                  Proses verifikasi otomatis. Bayar sebelum 24 jam.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-4 text-center">
-                <div className="flex items-center justify-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-green-600 font-bold text-sm">GOPAY</div>
-                  <div className="text-left">
-                    <p className="font-semibold text-gray-900">GoPay</p>
-                    <p className="text-sm text-gray-500">Scan QRIS</p>
-                  </div>
-                </div>
-                
-                <div className="bg-white p-4 rounded-2xl border-2 border-gray-100 inline-block mx-auto shadow-sm">
-                  <div className="w-48 h-48 bg-gray-50 rounded-xl flex items-center justify-center">
-                    <QrCode size={120} className="text-gray-400" />
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600">
-                  Buka aplikasi Gojek atau e-wallet lain, lalu scan QR code di atas.
-                </p>
-              </div>
-            )}
-          </div>
-
-          <div className="pt-2">
-            <Button 
-              fullWidth 
-              size="lg" 
-              onClick={handleConfirmPayment}
-              isLoading={isSubmitting}
-            >
-              Simulasikan Pembayaran Berhasil
-            </Button>
-            <button 
-              onClick={() => {
-                setShowPaymentModal(false)
-                navigate('/buyer/orders')
-              }}
-              className="w-full mt-3 text-sm text-gray-500 hover:text-gray-700 font-medium py-2"
-            >
-              Bayar Nanti (Lihat di Pesanan Saya)
-            </button>
-          </div>
-        </div>
-      </Modal>
     </div>
   )
 }

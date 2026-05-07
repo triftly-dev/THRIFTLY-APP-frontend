@@ -35,33 +35,28 @@ const Chat = () => {
     if (!productId && !otherUserId) {
       // Load conversations list
       const fetchConversations = async () => {
-        const convos = messageService.getConversationsList(user.id)
-        
-        // Enrich with product and user details
-        const enrichedConvos = await Promise.all(convos.map(async c => {
-          let p = null
-          let u = null
+        try {
+          const rawConvos = await messageService.getConversationsList()
           
-          if (c.productId) {
-            try {
-              p = await productService.getProductById(c.productId)
-            } catch (e) {
-              console.error("Gagal load product buat chat list", e)
+          // Data sekarang sudah di-group dan di-enrich oleh backend
+          const mappedConvos = rawConvos.map(c => {
+            const otherUser = (c.sender_id === user.id) ? c.receiver : c.sender
+            return {
+              ...c,
+              productId: c.product_id,
+              otherUserId: otherUser?.id,
+              otherUser: otherUser,
+              lastMessage: c.message,
+              timestamp: c.created_at,
+              unread: c.unread_count > 0,
+              unreadCount: c.unread_count
             }
-          }
+          })
           
-          if (c.otherUserId) {
-            try {
-              u = await userService.getUserById(c.otherUserId)
-            } catch (e) {
-              console.error("Gagal load user buat chat list", e)
-            }
-          }
-          
-          return { ...c, product: p, otherUser: u }
-        }))
-        
-        setConversations(enrichedConvos)
+          setConversations(mappedConvos)
+        } catch (error) {
+          console.error("Gagal ambil daftar percakapan:", error)
+        }
       }
       
       fetchConversations()
@@ -99,9 +94,8 @@ const Chat = () => {
     if (user && otherUser && product) {
       loadMessages()
       // Mark as read
-      messageService.markAllAsRead(user.id, product.id)
+      messageService.markAsRead(product.id, otherUser.id)
       
-      // Simple polling for new messages (since we use localStorage)
       const interval = setInterval(() => {
         loadMessages()
       }, 3000)
@@ -114,10 +108,27 @@ const Chat = () => {
     scrollToBottom()
   }, [messages])
 
-  const loadMessages = () => {
+  const loadMessages = async () => {
     if (user && otherUser && product) {
-      const msgs = messageService.getConversation(product.id, user.id, otherUser.id)
-      setMessages(msgs)
+      try {
+        // Panggil service dengan parameter PRODUK dan LAWAN BICARA
+        const msgs = await messageService.getConversation(product.id, otherUser.id)
+        
+        // Map data dari snake_case (backend) ke camelCase (JSX)
+        const mappedMsgs = (msgs || []).map(m => ({
+          ...m,
+          senderId: m.sender_id,
+          receiverId: m.receiver_id,
+          productId: m.product_id,
+          timestamp: m.created_at,
+          read: m.is_read
+        }))
+        
+        setMessages(mappedMsgs)
+      } catch (error) {
+        console.error("Gagal load messages:", error)
+        setMessages([])
+      }
     }
   }
 
@@ -265,14 +276,14 @@ const Chat = () => {
 
             {/* Messages Area */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#f8f9fa]">
-              {messages.length === 0 ? (
+              {(messages || []).length === 0 ? (
                 <div className="h-full flex items-center justify-center">
                   <div className="text-center text-gray-500 bg-white px-4 py-3 rounded-xl shadow-sm border border-gray-100">
                     <p className="text-sm">Belum ada pesan. Mulai percakapan sekarang!</p>
                   </div>
                 </div>
               ) : (
-                messages.map((msg, index) => {
+                (messages || []).map((msg, index) => {
                   const isMe = msg.senderId === user.id
                   const showDate = index === 0 || 
                     new Date(msg.timestamp).toDateString() !== new Date(messages[index-1].timestamp).toDateString()

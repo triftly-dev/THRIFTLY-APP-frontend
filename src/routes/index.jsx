@@ -12,6 +12,7 @@ import SellerRegister from '../pages/seller/SellerRegister'
 import BuyerDashboard from '../pages/buyer/BuyerDashboard'
 import MyOrders from '../pages/buyer/MyOrders'
 import Checkout from '../pages/buyer/Checkout'
+import PaymentDetail from '../pages/buyer/PaymentDetail'
 
 import SellerDashboard from '../pages/seller/SellerDashboard'
 import AddProduct from '../pages/seller/AddProduct'
@@ -85,6 +86,14 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={['user']}>
             <Checkout />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/payment/success/:orderId"
+        element={
+          <ProtectedRoute allowedRoles={['user']}>
+            <PaymentDetail />
           </ProtectedRoute>
         }
       />

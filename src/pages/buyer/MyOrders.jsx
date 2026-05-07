@@ -20,6 +20,8 @@ const MyOrders = () => {
   const [activeTab, setActiveTab] = useState('Semua')
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false)
   const [selectedOrderIdToComplete, setSelectedOrderIdToComplete] = useState(null)
+  const [selectedOrder, setSelectedOrder] = useState(null)
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
 
   useEffect(() => {
     if (user) {
@@ -30,7 +32,7 @@ const MyOrders = () => {
   const filteredOrders = orders.filter(order => {
     switch (activeTab) {
       case 'Belum Bayar': return order.status === 'pending'
-      case 'Disiapkan': return order.status === 'paid'
+      case 'Disiapkan': return order.status === 'paid' || order.status === 'settlement'
       case 'Dikirim': return order.status === 'shipped'
       case 'Selesai': return order.status === 'completed'
       case 'Ditolak': return order.status === 'retur' || order.status === 'canceled' || order.status === 'failed'
@@ -47,10 +49,10 @@ const MyOrders = () => {
         let product = null;
         let seller = null;
         try {
-          product = await productService.getProductById(order.productId)
+          product = await productService.getProductById(order.product_id)
         } catch(e) {}
         try {
-          seller = await userService.getUserById(order.sellerId)
+          seller = await userService.getUserById(order.seller_id)
         } catch(e) {}
         
         return {
@@ -75,6 +77,11 @@ const MyOrders = () => {
     setIsCompleteModalOpen(true)
   }
 
+  const handleShowDetail = (order) => {
+    setSelectedOrder(order)
+    setIsDetailModalOpen(true)
+  }
+
   const confirmSelesaikanPesanan = () => {
     if (selectedOrderIdToComplete) {
       try {
@@ -95,6 +102,7 @@ const MyOrders = () => {
       case 'pending':
         return <Badge variant="warning">Menunggu Pembayaran</Badge>
       case 'paid':
+      case 'settlement':
         return <Badge variant="info">Dikemas Penjual</Badge>
       case 'shipped':
         return <Badge variant="primary">Sedang Dikirim</Badge>
@@ -181,7 +189,7 @@ const MyOrders = () => {
                     <div className="flex-1">
                       <h3 className="font-medium text-gray-900 mb-1">{order.product?.nama || 'Produk tidak tersedia'}</h3>
                       <p className="text-sm text-gray-500 mb-2">Total Belanja</p>
-                      <p className="font-bold text-primary-700">{formatCurrency(order.hargaFinal + order.ongkir + 2500)}</p>
+                      <p className="font-bold text-primary-700">{formatCurrency(parseInt(order.harga_final) + parseInt(order.ongkir) + 2500)}</p>
                     </div>
                   </div>
 
@@ -196,16 +204,26 @@ const MyOrders = () => {
                   )}
 
                   <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
-                    <Button variant="outline" onClick={() => window.location.href = `/chat?product=${order.productId}&user=${order.sellerId}`}>
-                      Chat Penjual
+                    <Button variant="outline" size="sm" onClick={() => handleShowDetail(order)}>
+                      Detail
                     </Button>
+                    <Button variant="outline" size="sm" onClick={() => window.location.href = `/chat?product=${order.productId}&user=${order.sellerId}`}>
+                      Chat
+                    </Button>
+                    
+                    {order.status === 'pending' && (
+                      <Button size="sm" className="bg-primary-600" onClick={() => window.location.href = `/payment/success/${order.order_id}`}>
+                        Bayar Sekarang
+                      </Button>
+                    )}
+
                     {order.status === 'shipped' && (
-                      <Button onClick={() => handleSelesaikanPesanan(order.id)}>
-                        Selesaikan Pesanan
+                      <Button size="sm" onClick={() => handleSelesaikanPesanan(order.id)}>
+                        Terima Barang
                       </Button>
                     )}
                     {order.status === 'completed' && (
-                      <Button variant="secondary" onClick={() => window.location.href = `/products/${order.productId}`}>
+                      <Button variant="secondary" size="sm" onClick={() => window.location.href = `/products/${order.productId}`}>
                         Beli Lagi
                       </Button>
                     )}
@@ -236,6 +254,83 @@ const MyOrders = () => {
             <Button variant="success" onClick={confirmSelesaikanPesanan} className="px-6 bg-emerald-600 hover:bg-emerald-700 text-white border-none">Ya, Selesaikan</Button>
           </div>
         </div>
+      </Modal>
+
+      {/* Modal Detail Pesanan */}
+      <Modal
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        title="Rincian Pesanan"
+        size="md"
+      >
+        {selectedOrder && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-start border-b border-gray-100 pb-4">
+              <div>
+                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Nomor Order</p>
+                <p className="font-bold text-gray-900">{selectedOrder.order_id}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Tanggal Transaksi</p>
+                <p className="text-sm font-medium text-gray-900">{formatDate(selectedOrder.createdAt)}</p>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-bold text-gray-900 mb-3 text-sm flex items-center gap-2">
+                <Package size={16} className="text-primary-600" />
+                Detail Produk
+              </h4>
+              <div className="bg-gray-50 rounded-xl p-4 flex gap-4">
+                <img src={selectedOrder.product?.fotos?.[0]} className="w-16 h-16 rounded-lg object-cover" />
+                <div>
+                  <p className="font-semibold text-gray-900">{selectedOrder.product?.nama}</p>
+                  <p className="text-xs text-gray-500 mt-1">Penjual: {selectedOrder.seller?.name}</p>
+                  <p className="text-sm font-bold text-primary-600 mt-2">{formatCurrency(selectedOrder.product?.harga)}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-bold text-gray-900 mb-2 text-sm">Info Pengiriman</h4>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  <span className="font-semibold text-gray-700 block mb-1">Alamat:</span>
+                  {selectedOrder.alamat_pengiriman}
+                </p>
+                <p className="text-xs text-gray-500 mt-3">
+                  <span className="font-semibold text-gray-700 block mb-1">Estimasi Sampai:</span>
+                  2 - 4 Hari Kerja
+                </p>
+              </div>
+              <div>
+                <h4 className="font-bold text-gray-900 mb-2 text-sm">Rincian Pembayaran</h4>
+                <div className="space-y-1 text-xs">
+                  <div className="flex justify-between text-gray-500">
+                    <span>Harga Barang</span>
+                    <span>{formatCurrency(selectedOrder.product?.harga)}</span>
+                  </div>
+                  <div className="flex justify-between text-gray-500">
+                    <span>Ongkos Kirim</span>
+                    <span>{formatCurrency(selectedOrder.ongkir || 0)}</span>
+                  </div>
+                  <div className="flex justify-between text-gray-500">
+                    <span>Biaya Layanan</span>
+                    <span>{formatCurrency(2500)}</span>
+                  </div>
+                  <div className="flex justify-between font-bold text-gray-900 border-t border-gray-100 pt-2 mt-2 text-sm">
+                    <span>Total Bayar</span>
+                    <span>{formatCurrency(parseInt(selectedOrder.harga_final) + (parseInt(selectedOrder.ongkir) || 0) + 2500)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4">
+              <Button fullWidth onClick={() => setIsDetailModalOpen(false)}>Tutup</Button>
+            </div>
+          </div>
+        )}
       </Modal>
 
     </div>

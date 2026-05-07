@@ -36,10 +36,10 @@ const SellerOrders = () => {
         let product = null;
         let buyer = null;
         try {
-          product = await productService.getProductById(order.productId)
+          product = await productService.getProductById(order.product_id)
         } catch(e) {}
         try {
-          buyer = await userService.getUserById(order.buyerId)
+          buyer = await userService.getUserById(order.buyer_id)
         } catch(e) {}
         
         return {
@@ -96,7 +96,7 @@ const SellerOrders = () => {
 
   const filteredOrders = orders.filter(order => {
     switch (activeTab) {
-      case 'Perlu Diproses': return order.status === 'paid'
+      case 'Perlu Diproses': return order.status === 'paid' || order.status === 'settlement'
       case 'Telah Diproses': return order.status === 'shipped' || order.status === 'completed'
       case 'Pembatalan': return order.status === 'retur' || order.status === 'canceled'
       default: return true
@@ -104,15 +104,16 @@ const SellerOrders = () => {
   })
 
   // Calculate Stats
-  const statPerluDiproses = orders.filter(o => o.status === 'paid').length
+  const statPerluDiproses = orders.filter(o => o.status === 'paid' || o.status === 'settlement').length
   const statTelahDiproses = orders.filter(o => o.status === 'shipped' || o.status === 'completed').length
   const statPembatalan = orders.filter(o => o.status === 'retur' || o.status === 'canceled').length
-  const statPendapatan = orders.filter(o => o.status === 'completed').reduce((acc, curr) => acc + curr.hargaFinal, 0)
+  const statPendapatan = orders.filter(o => o.status === 'completed').reduce((acc, curr) => acc + parseInt(curr.harga_final), 0)
 
   const getStatusBadge = (status) => {
     switch (status) {
       case 'pending': return <Badge variant="warning">Menunggu Pembayaran</Badge>
-      case 'paid': return <Badge variant="info">Perlu Dikirim</Badge>
+      case 'paid':
+      case 'settlement': return <Badge variant="info">Dikemas Penjual</Badge>
       case 'shipped': return <Badge variant="primary">Sedang Dikirim</Badge>
       case 'completed': return <Badge variant="success">Selesai</Badge>
       case 'retur': return <Badge variant="error">Dibatalkan/Retur</Badge>
@@ -213,7 +214,7 @@ const SellerOrders = () => {
                     <div className="flex-1">
                       <h3 className="font-medium text-gray-900 mb-1">{order.product?.nama || 'Produk tidak tersedia'}</h3>
                       <p className="text-sm text-gray-500 mb-2">Tagihan Dibayar Pembeli</p>
-                      <p className="font-bold text-primary-700">{formatCurrency(order.hargaFinal + order.ongkir + 2500)}</p>
+                      <p className="font-bold text-primary-700">{formatCurrency(parseInt(order.harga_final) + parseInt(order.ongkir) + 2500)}</p>
                     </div>
                   </div>
 
@@ -232,7 +233,7 @@ const SellerOrders = () => {
                       Chat Pembeli
                     </Button>
                     
-                    {order.status === 'paid' && (
+                    {(order.status === 'paid' || order.status === 'settlement') && (
                       <Button onClick={() => handleKirimBarang(order.id)}>
                         Kirim Barang Sekarang
                       </Button>

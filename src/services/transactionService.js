@@ -1,26 +1,39 @@
-import { storage, STORAGE_KEYS } from './localStorage'
-import { generateId } from '../utils/helpers'
-import { productService } from './productService'
-import { userService } from './userService'
+import api from './api'
 
 export const transactionService = {
-  getAllTransactions() {
-    return storage.get(STORAGE_KEYS.TRANSACTIONS) || []
+  async getAllTransactions() {
+    const response = await api.get('/transactions')
+    return response.data
   },
 
-  getTransactionById(id) {
-    const transactions = this.getAllTransactions()
-    return transactions.find(transaction => transaction.id === id)
+  async getAdminTransactions() {
+    const response = await api.get('/admin/transactions')
+    return response.data
   },
 
-  getTransactionsByBuyer(buyerId) {
-    const transactions = this.getAllTransactions()
-    return transactions.filter(transaction => transaction.buyerId === buyerId)
+  async getTransactionById(id) {
+    const response = await api.get(`/transactions/${id}`)
+    return response.data
   },
 
-  getTransactionsBySeller(sellerId) {
-    const transactions = this.getAllTransactions()
-    return transactions.filter(transaction => transaction.sellerId === sellerId)
+  async getTransactionByOrderId(orderId) {
+    const transactions = await this.getAllTransactions()
+    return transactions.find(t => t.order_id === orderId)
+  },
+
+  async charge(data) {
+    const response = await api.post('/payment/charge', data)
+    return response.data
+  },
+
+  async getTransactionsByBuyer(buyerId) {
+    const response = await api.get('/transactions')
+    return response.data
+  },
+
+  async getTransactionsBySeller(sellerId) {
+    const response = await api.get('/seller/orders')
+    return response.data
   },
 
   async createTransaction(transactionData) {
@@ -93,38 +106,19 @@ export const transactionService = {
     return transactions[index]
   },
 
-  markAsShipped(id, videoPacking = '') {
-    const transactions = this.getAllTransactions()
-    const index = transactions.findIndex(transaction => transaction.id === id)
-    
-    if (index === -1) {
-      throw new Error('Transaksi tidak ditemukan')
-    }
-
-    transactions[index].status = 'shipped'
-    transactions[index].videoPacking = videoPacking
-    transactions[index].shippedAt = new Date().toISOString()
-
-    storage.set(STORAGE_KEYS.TRANSACTIONS, transactions)
-    return transactions[index]
+  async markAsShipped(id, videoPacking = '') {
+    const response = await api.post(`/transactions/${id}/status`, {
+      status: 'shipped',
+      video_packing: videoPacking
+    })
+    return response.data
   },
 
   async markAsCompleted(id) {
-    const transactions = this.getAllTransactions()
-    const index = transactions.findIndex(transaction => transaction.id === id)
-    
-    if (index === -1) {
-      throw new Error('Transaksi tidak ditemukan')
-    }
-
-    const transaction = transactions[index]
-    transactions[index].status = 'completed'
-    transactions[index].completedAt = new Date().toISOString()
-
-    storage.set(STORAGE_KEYS.TRANSACTIONS, transactions)
-
-    // Saldo update di sini juga kita abaikan di sisi client untuk menghindari 403
-    return transactions[index]
+    const response = await api.post(`/transactions/${id}/status`, {
+      status: 'completed'
+    })
+    return response.data
   },
 
 
