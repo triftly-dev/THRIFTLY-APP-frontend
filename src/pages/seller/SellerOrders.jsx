@@ -77,20 +77,15 @@ const SellerOrders = () => {
     setIsCancelModalOpen(true)
   }
 
-  const confirmBatalkan = () => {
+  const confirmBatalkan = async () => {
     if (selectedOrderIdToCancel) {
       try {
-        const transactions = transactionService.getAllTransactions()
-        const index = transactions.findIndex(t => t.id === selectedOrderIdToCancel)
-        if (index > -1) {
-          transactions[index].status = 'retur' // Kita anggap retur/batal
-          transactionService.getAllTransactions = () => transactions; // hack for memory mock
-          localStorage.setItem('secondnesia_transactions', JSON.stringify(transactions))
-        }
-        toast.success('Pesanan dibatalkan.')
+        await transactionService.updateTransactionStatus(selectedOrderIdToCancel, 'canceled')
+        toast.success('Pesanan berhasil dibatalkan.')
         loadOrders()
       } catch (error) {
-        toast.error('Gagal membatalkan pesanan')
+        console.error(error)
+        toast.error('Gagal membatalkan pesanan. Pastikan server merespon dengan benar.')
       } finally {
         setIsCancelModalOpen(false)
         setSelectedOrderIdToCancel(null)

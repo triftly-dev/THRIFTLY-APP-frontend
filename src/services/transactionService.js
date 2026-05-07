@@ -115,6 +115,13 @@ export const transactionService = {
     return response.data
   },
 
+  async updateTransactionStatus(id, status) {
+    const response = await api.post(`/transactions/${id}/status`, {
+      status: status
+    })
+    return response.data
+  },
+
   async markAsCompleted(id) {
     const response = await api.post(`/transactions/${id}/status`, {
       status: 'completed'

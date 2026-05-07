@@ -99,11 +99,12 @@ const MyOrders = () => {
     if (!orderToCancel) return
 
     try {
-      // Simulasi update status ke canceled (Seharusnya memanggil API)
-      // Jika sudah ada API, ganti dengan transactionService.cancelTransaction(orderToCancel.id, cancelReason)
+      // Menggunakan API untuk membatalkan pesanan
+      await transactionService.updateTransactionStatus(orderToCancel.id, 'canceled')
       toast.success('Pesanan berhasil dibatalkan')
       loadOrders()
     } catch (error) {
+      console.error(error)
       toast.error('Gagal membatalkan pesanan')
     } finally {
       setIsCancelModalOpen(false)
