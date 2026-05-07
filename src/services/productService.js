@@ -7,8 +7,11 @@ const formatImages = (images) => {
   if (!images) return []
   const imageArray = Array.isArray(images) ? images : JSON.parse(images || '[]')
   return imageArray.map(img => {
-    if (img.startsWith('http')) return img // Jika sudah URL lengkap (Base64 atau external)
-    return `${STORAGE_URL}products/${img}` // Jika hanya nama file (hasil upload)
+    // Jika sudah URL lengkap, Base64, atau sudah ada path /storage, biarkan saja
+    if (img.startsWith('http') || img.startsWith('data:') || img.startsWith('/storage')) {
+      return img.startsWith('/storage') ? `https://api.thriftly.my.id${img}` : img
+    }
+    return `${STORAGE_URL}products/${img}` 
   })
 }
 
