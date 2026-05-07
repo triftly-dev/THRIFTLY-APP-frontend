@@ -80,23 +80,38 @@ const Checkout = () => {
     setIsSubmitting(true)
     
     try {
-      // 1. Panggil Backend menggunakan Core API (Charge)
-      // Kita kirim 'bank' sesuai pilihan user. Sementara default 'bca' jika pilih transfer_bank
-      const response = await api.post('/payment/charge', {
+      // Menggunakan SNAP Token (Jauh lebih stabil untuk akun baru di Production)
+      const response = await api.post('/payment/token', {
         product_id: product.id,
         price: totalPembayaran,
-        bank: paymentMethod === 'transfer_bank' ? 'bca' : paymentMethod, // sesuaikan mappingnya
+        bank: paymentMethod === 'transfer_bank' ? 'bca' : paymentMethod,
         seller_id: seller?.id || product.user_id,
         alamat_pengiriman: user.alamat || user.profile?.alamat,
         ongkir: ongkir
       });
 
-      if (response.data.success) {
-        toast.success('Pemesanan Berhasil! Silakan selesaikan pembayaran.');
-        // 2. Langsung arahkan ke halaman Invoice buatan kita
-        navigate(`/payment/success/${response.data.data.order_id}`);
+      if (response.data.token) {
+        // Panggil Popup Midtrans
+        window.snap.pay(response.data.token, {
+          onSuccess: (result) => {
+            toast.success('Pembayaran Berhasil!');
+            navigate('/buyer/orders');
+          },
+          onPending: (result) => {
+            toast.info('Menunggu Pembayaran...');
+            navigate('/buyer/orders');
+          },
+          onError: (err) => {
+            toast.error('Pembayaran Gagal!');
+            console.error(err);
+          },
+          onClose: () => {
+            toast.warning('Anda menutup jendela pembayaran sebelum selesai.');
+            setIsSubmitting(false);
+          }
+        });
       } else {
-        throw new Error(response.data.message || 'Gagal memproses pembayaran');
+        throw new Error('Gagal mendapatkan token pembayaran');
       }
       
     } catch (error) {
