@@ -70,7 +70,7 @@ const MyOrders = () => {
       
       enrichedOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       
-      setOrders(enrichedOrders)
+      setOrders(enrichedOrders.filter(o => o.status !== 'deleted'))
     } catch (err) {
       console.error(err)
     } finally {
@@ -100,8 +100,8 @@ const MyOrders = () => {
 
     try {
       if (cancelType === 'simple') {
-        // Jika belum bayar, hapus saja dari data
-        await transactionService.deleteTransaction(orderToCancel.id)
+        // Jika belum bayar, kita tandai sebagai 'deleted' agar hilang dari tampilan
+        await transactionService.updateTransactionStatus(orderToCancel.id, 'deleted')
         toast.success('Pesanan berhasil dihapus')
       } else {
         // Jika sudah bayar, ubah status jadi canceled agar masuk tab Ditolak
