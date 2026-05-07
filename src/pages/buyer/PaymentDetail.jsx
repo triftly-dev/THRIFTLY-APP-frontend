@@ -50,6 +50,7 @@ const PaymentDetail = () => {
         // Asumsi ada method getTransactionByOrderId
         // Jika belum ada, kita bisa filter dari list transactions
         const data = await transactionService.getTransactionByOrderId(orderId)
+        console.log('DEBUG TRANSACTION:', data)
         setTransaction(data)
       } catch (error) {
         console.error("Gagal mengambil data pembayaran:", error)
