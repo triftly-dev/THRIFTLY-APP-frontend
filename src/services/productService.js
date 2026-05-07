@@ -1,5 +1,17 @@
 import api from './api'
 
+const STORAGE_URL = 'https://api.thriftly.my.id/storage/'
+
+// Helper untuk merapikan link gambar
+const formatImages = (images) => {
+  if (!images) return []
+  const imageArray = Array.isArray(images) ? images : JSON.parse(images || '[]')
+  return imageArray.map(img => {
+    if (img.startsWith('http')) return img // Jika sudah URL lengkap (Base64 atau external)
+    return `${STORAGE_URL}products/${img}` // Jika hanya nama file (hasil upload)
+  })
+}
+
 export const productService = {
   // Mengambil semua produk yang disetujui untuk marketplace
   async getApprovedProducts() {
@@ -9,7 +21,7 @@ export const productService = {
       ...p,
       nama: p.name,
       harga: p.price,
-      fotos: p.images || [],
+      fotos: formatImages(p.images),
       isBU: p.is_bu,
       lokasi: p.location
     }))
@@ -22,7 +34,7 @@ export const productService = {
       ...p,
       nama: p.name,
       harga: p.price,
-      fotos: p.images || [],
+      fotos: formatImages(p.images),
       isBU: p.is_bu,
       sellerId: p.user_id,
       lokasi: p.location
@@ -36,7 +48,7 @@ export const productService = {
       ...p,
       nama: p.name,
       harga: p.price,
-      fotos: p.images || [],
+      fotos: formatImages(p.images),
       isBU: p.is_bu,
       stok: p.stock,
       sellerId: p.user_id,
@@ -53,7 +65,7 @@ export const productService = {
       ...p,
       nama: p.name,
       harga: p.price,
-      fotos: p.images || [],
+      fotos: formatImages(p.images),
       isBU: p.is_bu,
       stok: p.stock,
       lokasi: p.location
