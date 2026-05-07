@@ -50,7 +50,11 @@ const SellerOrders = () => {
       }))
       
       enrichedOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-      setOrders(enrichedOrders)
+      
+      // Filter: Hanya tampilkan pesanan yang sudah dibayar atau status lainnya (kecuali pending)
+      const validOrdersForSeller = enrichedOrders.filter(o => o.status !== 'pending')
+      
+      setOrders(validOrdersForSeller)
     } catch(err) {
       console.error(err)
     } finally {
