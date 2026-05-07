@@ -29,12 +29,12 @@ export const transactionService = {
 
   async getTransactionsByBuyer(buyerId) {
     const response = await api.get('/transactions')
-    return response.data
+    return response.data.data || response.data
   },
 
   async getTransactionsBySeller(sellerId) {
     const response = await api.get('/seller/orders')
-    return response.data
+    return response.data.data || response.data
   },
 
   async createTransaction(transactionData) {
