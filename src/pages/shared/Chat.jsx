@@ -202,11 +202,12 @@ const Chat = () => {
                       </div>
                       
                       <div className="flex items-center gap-2">
-                        {convo.product && (
+                        {convo.product && convo.product.fotos?.[0] && (
                           <img 
-                            src={convo.product.fotos?.[0]} 
+                            src={convo.product.fotos[0]} 
                             alt="" 
                             className="w-8 h-8 rounded object-cover border border-gray-200 shrink-0"
+                            onError={(e) => e.target.style.display = 'none'}
                           />
                         )}
                         <p className={`text-sm truncate ${convo.unread ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>
@@ -260,6 +261,7 @@ const Chat = () => {
                 src={product.fotos?.[0]} 
                 alt={product.nama} 
                 className="w-12 h-12 rounded-lg object-cover border border-gray-200"
+                onError={(e) => e.target.style.display = 'none'}
               />
               <div className="flex-1 min-w-0">
                 <h4 className="text-sm font-medium text-gray-900 truncate">{product.nama}</h4>
