@@ -15,6 +15,33 @@ const PaymentDetail = () => {
   const [loading, setLoading] = useState(true)
   const [checking, setChecking] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [timeLeft, setTimeLeft] = useState('')
+
+  useEffect(() => {
+    let timer;
+    if (transaction?.expiry_time) {
+      timer = setInterval(() => {
+        const now = new Date().getTime()
+        const expiry = new Date(transaction.expiry_time).getTime()
+        const distance = expiry - now
+
+        if (distance < 0) {
+          clearInterval(timer)
+          setTimeLeft('EXPIRED')
+          return
+        }
+
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000)
+
+        setTimeLeft(
+          `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+        )
+      }, 1000)
+    }
+    return () => clearInterval(timer)
+  }, [transaction])
   const [openAccordion, setOpenAccordion] = useState(0)
 
   useEffect(() => {
@@ -127,7 +154,7 @@ const PaymentDetail = () => {
             <div className="bg-white p-3 rounded-xl border border-orange-200 shadow-sm text-center min-w-[100px]">
               <div className="flex items-center gap-2 text-orange-600 font-mono font-bold text-xl">
                 <Clock size={20} />
-                <span>23:59:46</span>
+                <span>{timeLeft || '23:59:59'}</span>
               </div>
             </div>
           </div>
@@ -146,10 +173,10 @@ const PaymentDetail = () => {
               </div>
               <div className="flex items-center justify-between bg-gray-50 p-4 rounded-xl border border-gray-100">
                 <span className="text-2xl font-bold text-gray-900 tracking-wider">
-                  {transaction.va_number || 'Tersedia di Midtrans'}
+                  {transaction.va_number || transaction.payment_code || transaction.bill_key || 'Memuat...'}
                 </span>
                 <button 
-                  onClick={() => copyToClipboard(transaction.va_number)}
+                  onClick={() => copyToClipboard(transaction.va_number || transaction.payment_code || transaction.bill_key)}
                   className="p-2 hover:bg-white rounded-lg transition-all text-primary-600"
                 >
                   <Copy size={20} />
