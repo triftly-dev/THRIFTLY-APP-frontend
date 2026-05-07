@@ -96,7 +96,8 @@ const SellerOrders = () => {
   const filteredOrders = orders.filter(order => {
     switch (activeTab) {
       case 'Perlu Diproses': return order.status === 'paid' || order.status === 'settlement'
-      case 'Telah Diproses': return order.status === 'shipped' || order.status === 'completed'
+      case 'Telah Diproses': return order.status === 'shipped'
+      case 'Selesai': return order.status === 'completed'
       case 'Pembatalan': return order.status === 'retur' || order.status === 'canceled'
       default: return true
     }
@@ -166,7 +167,7 @@ const SellerOrders = () => {
           </div>
 
           <div className="flex overflow-x-auto hide-scrollbar gap-2 mb-6 pb-2 border-b border-gray-200">
-            {['Semua', 'Perlu Diproses', 'Telah Diproses', 'Pembatalan'].map(tab => (
+            {['Semua', 'Perlu Diproses', 'Telah Diproses', 'Selesai', 'Pembatalan'].map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
