@@ -238,15 +238,14 @@ const SellerOrders = () => {
                     </Button>
                     
                     {(order.status === 'paid' || order.status === 'settlement') && (
-                      <Button onClick={() => handleKirimBarang(order.id)}>
-                        Kirim Barang Sekarang
-                      </Button>
-                    )}
-                    
-                    {order.status === 'pending' && (
-                      <Button variant="danger" onClick={() => handleBatalkan(order.id)}>
-                        Batalkan Order
-                      </Button>
+                      <>
+                        <Button variant="danger" onClick={() => handleBatalkan(order.id)}>
+                          Batalkan Order
+                        </Button>
+                        <Button onClick={() => handleKirimBarang(order.id)}>
+                          Kirim Barang Sekarang
+                        </Button>
+                      </>
                     )}
                   </div>
                 </div>
