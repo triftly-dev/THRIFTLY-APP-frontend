@@ -165,12 +165,14 @@ const PaymentDetail = () => {
             <div className="mb-8">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-gray-500 text-sm">Nomor Virtual Account</p>
-                <img 
-                  src={`https://api.thriftly.my.id/storage/banks/${transaction.bank || 'bca'}.png`} 
-                  alt={transaction.bank} 
-                  className="h-6 object-contain grayscale"
-                  onError={(e) => e.target.style.display = 'none'}
-                />
+                <div className={`px-3 py-1 rounded-lg font-bold text-xs uppercase ${
+                  transaction.bank === 'bca' ? 'bg-blue-100 text-blue-600' :
+                  transaction.bank === 'bri' ? 'bg-orange-100 text-orange-600' :
+                  transaction.bank === 'gopay' ? 'bg-green-100 text-green-600' :
+                  'bg-gray-100 text-gray-600'
+                }`}>
+                  {transaction.bank || 'Bank'}
+                </div>
               </div>
               <div className="flex items-center justify-between bg-gray-50 p-4 rounded-xl border border-gray-100">
                 <span className="text-2xl font-bold text-gray-900 tracking-wider">
