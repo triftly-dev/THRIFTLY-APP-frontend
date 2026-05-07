@@ -22,6 +22,12 @@ const MyOrders = () => {
   const [selectedOrderIdToComplete, setSelectedOrderIdToComplete] = useState(null)
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
+  
+  // States for Cancellation
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false)
+  const [cancelType, setCancelType] = useState('simple') // 'simple' or 'reason'
+  const [cancelReason, setCancelReason] = useState('')
+  const [orderToCancel, setOrderToCancel] = useState(null)
 
   useEffect(() => {
     if (user) {
@@ -80,6 +86,29 @@ const MyOrders = () => {
   const handleShowDetail = (order) => {
     setSelectedOrder(order)
     setIsDetailModalOpen(true)
+  }
+
+  const handleCancelOrder = (order, type) => {
+    setOrderToCancel(order)
+    setCancelType(type)
+    setCancelReason('')
+    setIsCancelModalOpen(true)
+  }
+
+  const confirmCancelOrder = async () => {
+    if (!orderToCancel) return
+
+    try {
+      // Simulasi update status ke canceled (Seharusnya memanggil API)
+      // Jika sudah ada API, ganti dengan transactionService.cancelTransaction(orderToCancel.id, cancelReason)
+      toast.success('Pesanan berhasil dibatalkan')
+      loadOrders()
+    } catch (error) {
+      toast.error('Gagal membatalkan pesanan')
+    } finally {
+      setIsCancelModalOpen(false)
+      setOrderToCancel(null)
+    }
   }
 
   const confirmSelesaikanPesanan = () => {
@@ -212,8 +241,19 @@ const MyOrders = () => {
                     </Button>
                     
                     {order.status === 'pending' && (
-                      <Button size="sm" className="bg-primary-600" onClick={() => window.location.href = `/payment/success/${order.order_id}`}>
-                        Bayar Sekarang
+                      <div className="flex gap-3">
+                        <Button variant="danger" outline size="sm" onClick={() => handleCancelOrder(order, 'simple')}>
+                          Batalkan Pesanan
+                        </Button>
+                        <Button size="sm" className="bg-primary-600" onClick={() => window.location.href = `/payment/success/${order.order_id}`}>
+                          Bayar Sekarang
+                        </Button>
+                      </div>
+                    )}
+
+                    {(order.status === 'paid' || order.status === 'settlement') && (
+                      <Button variant="danger" outline size="sm" onClick={() => handleCancelOrder(order, 'reason')}>
+                        Batalkan Pesanan
                       </Button>
                     )}
 
@@ -236,6 +276,51 @@ const MyOrders = () => {
       </main>
 
       <Footer />
+
+      {/* Modal Pembatalan Pesanan */}
+      <Modal
+        isOpen={isCancelModalOpen}
+        onClose={() => setIsCancelModalOpen(false)}
+        title="Batalkan Pesanan"
+        size="sm"
+      >
+        <div className="space-y-4">
+          <p className="text-gray-600 text-sm">
+            {cancelType === 'simple' 
+              ? 'Yakin ingin membatalkan pesanan ini? Pesanan yang dibatalkan tidak dapat dikembalikan.'
+              : 'Mohon pilih alasan pembatalan pesanan Anda:'}
+          </p>
+          
+          {cancelType === 'reason' && (
+            <div className="space-y-2">
+              {['Ingin merubah alamat pengiriman', 'Ingin merubah metode pembayaran', 'Menemukan harga yang lebih murah', 'Berubah pikiran / Tidak ingin beli lagi'].map((reason) => (
+                <label key={reason} className="flex items-center gap-3 p-3 border border-gray-100 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
+                  <input 
+                    type="radio" 
+                    name="cancelReason" 
+                    value={reason} 
+                    onChange={(e) => setCancelReason(e.target.value)}
+                    className="text-primary-600"
+                  />
+                  <span className="text-sm text-gray-700">{reason}</span>
+                </label>
+              ))}
+            </div>
+          )}
+
+          <div className="flex gap-3 pt-4">
+            <Button variant="outline" fullWidth onClick={() => setIsCancelModalOpen(false)}>Kembali</Button>
+            <Button 
+              variant="danger" 
+              fullWidth 
+              disabled={cancelType === 'reason' && !cancelReason}
+              onClick={confirmCancelOrder}
+            >
+              Ya, Batalkan
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       {/* Tailwind Confirm Modal */}
       <Modal 
