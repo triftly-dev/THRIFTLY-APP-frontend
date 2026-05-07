@@ -263,6 +263,17 @@ const Checkout = () => {
 
                   <label className="flex items-center justify-between p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50">
                     <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center text-orange-600 font-bold text-xs">BRI</div>
+                      <div>
+                        <p className="font-medium text-gray-900">Transfer Bank BRI</p>
+                        <p className="text-xs text-gray-500">Dicek otomatis</p>
+                      </div>
+                    </div>
+                    <input type="radio" name="payment" value="bri" checked={paymentMethod === 'bri'} onChange={(e) => setPaymentMethod(e.target.value)} className="text-primary-600 w-5 h-5" />
+                  </label>
+
+                  <label className="flex items-center justify-between p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50">
+                    <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-green-600 font-bold text-xs">GOPAY</div>
                       <div>
                         <p className="font-medium text-gray-900">GoPay</p>
