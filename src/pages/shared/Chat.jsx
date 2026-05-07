@@ -184,7 +184,7 @@ const Chat = () => {
                   >
                     <div className="relative shrink-0">
                       <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-lg border-2 border-white shadow-sm">
-                        {convo.otherUser?.profile?.nama?.charAt(0) || '?'}
+                        {(convo.otherUser?.profile?.nama || convo.otherUser?.name || '?').charAt(0).toUpperCase()}
                       </div>
                       {convo.unread && (
                         <div className="absolute top-0 right-0 w-3.5 h-3.5 bg-red-500 border-2 border-white rounded-full"></div>
@@ -194,7 +194,7 @@ const Chat = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-baseline mb-1">
                         <h3 className={`font-medium truncate pr-2 ${convo.unread ? 'text-gray-900' : 'text-gray-700'}`}>
-                          {convo.otherUser?.profile?.nama || 'Pengguna'}
+                          {convo.otherUser?.profile?.nama || convo.otherUser?.name || 'Pengguna'}
                         </h3>
                         <span className="text-xs text-gray-400 shrink-0">
                           {formatDateTime(convo.timestamp).split(' ')[0]}
@@ -248,7 +248,7 @@ const Chat = () => {
                   {otherUser.profile?.nama?.charAt(0) || '?'}
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">{otherUser.profile?.nama || 'Pengguna'}</h3>
+                  <h3 className="font-semibold text-gray-900">{otherUser.profile?.nama || otherUser.name || 'Pengguna'}</h3>
                   <p className="text-xs text-gray-500 capitalize">{otherUser.role}</p>
                 </div>
               </div>
