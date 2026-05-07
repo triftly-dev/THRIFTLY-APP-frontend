@@ -90,9 +90,10 @@ const Checkout = () => {
       });
 
       if (response.data.success) {
+        console.log('DEBUG PAYMENT RESPONSE:', response.data);
         toast.success('Pesanan berhasil dibuat!');
-        // Arahkan ke halaman detail pembayaran agar user bisa melihat VA Number
-        navigate(`/buyer/payment-detail/${response.data.data.order_id}`);
+        // Menggunakan rute yang benar sesuai src/routes/index.jsx
+        navigate(`/payment/success/${response.data.data.order_id}`);
       } else {
         throw new Error('Gagal memproses pembayaran');
       }
