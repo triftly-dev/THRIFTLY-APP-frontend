@@ -3,7 +3,7 @@ import api from './api'
 export const transactionService = {
   async getAllTransactions() {
     const response = await api.get('/transactions')
-    return response.data
+    return response.data.data || response.data
   },
 
   async getAdminTransactions() {
@@ -17,7 +17,8 @@ export const transactionService = {
   },
 
   async getTransactionByOrderId(orderId) {
-    const transactions = await this.getAllTransactions()
+    const response = await this.getAllTransactions()
+    const transactions = Array.isArray(response) ? response : (response.data || [])
     return transactions.find(t => t.order_id === orderId)
   },
 
