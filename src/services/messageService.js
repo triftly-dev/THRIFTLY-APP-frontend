@@ -21,7 +21,8 @@ export const messageService = {
   async getConversationsList() {
     try {
       const response = await api.get('/messages')
-      return response.data // Array pesan
+      // Handle Laravel data wrapper
+      return Array.isArray(response.data) ? response.data : (response.data?.data || [])
     } catch (error) {
       console.error("Error fetching conversations list:", error)
       return []
@@ -34,7 +35,8 @@ export const messageService = {
   async getConversation(productId, otherUserId) {
     try {
       const response = await api.get(`/messages/${productId}/${otherUserId}`)
-      return response.data // Array pesan detail
+      // Handle Laravel data wrapper
+      return Array.isArray(response.data) ? response.data : (response.data?.data || [])
     } catch (error) {
       console.error("Error fetching conversation detail:", error)
       return []

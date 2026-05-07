@@ -37,9 +37,10 @@ const Chat = () => {
       const fetchConversations = async () => {
         try {
           const rawConvos = await messageService.getConversationsList()
+          const convoArray = Array.isArray(rawConvos) ? rawConvos : []
           
           // Data sekarang sudah di-group dan di-enrich oleh backend
-          const mappedConvos = rawConvos.map(c => {
+          const mappedConvos = convoArray.map(c => {
             const otherUser = (c.sender_id === user.id) ? c.receiver : c.sender
             return {
               ...c,
