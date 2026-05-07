@@ -91,7 +91,8 @@ const Checkout = () => {
 
       if (response.data.success) {
         toast.success('Pesanan berhasil dibuat!');
-        navigate('/buyer/orders');
+        // Arahkan ke halaman detail pembayaran agar user bisa melihat VA Number
+        navigate(`/buyer/payment-detail/${response.data.data.order_id}`);
       } else {
         throw new Error('Gagal memproses pembayaran');
       }
