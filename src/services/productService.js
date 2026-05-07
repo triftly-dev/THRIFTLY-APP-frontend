@@ -4,7 +4,8 @@ export const productService = {
   // Mengambil semua produk yang disetujui untuk marketplace
   async getApprovedProducts() {
     const response = await api.get('/products')
-    return response.data.map(p => ({
+    const products = Array.isArray(response.data) ? response.data : (response.data.data || [])
+    return products.map(p => ({
       ...p,
       nama: p.name,
       harga: p.price,
@@ -16,7 +17,8 @@ export const productService = {
 
   async getAllProducts() {
     const response = await api.get('/admin/products')
-    return response.data.map(p => ({
+    const products = Array.isArray(response.data) ? response.data : (response.data.data || [])
+    return products.map(p => ({
       ...p,
       nama: p.name,
       harga: p.price,
@@ -45,7 +47,9 @@ export const productService = {
   // Mengambil produk milik penjual yang sedang aktif
   async getMyProducts() {
     const response = await api.get('/my-products')
-    return response.data.map(p => ({
+    // Detect if Laravel Pagination object or simple array
+    const products = Array.isArray(response.data) ? response.data : (response.data.data || [])
+    return products.map(p => ({
       ...p,
       nama: p.name,
       harga: p.price,
