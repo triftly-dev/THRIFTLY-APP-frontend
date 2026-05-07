@@ -32,9 +32,9 @@ const Checkout = () => {
   const [transactionData, setTransactionData] = useState(null)
 
   const shippingRates = {
-    reguler: 15000,
-    next_day: 25000,
-    cargo: 35000
+    reguler: 0,
+    next_day: 0,
+    cargo: 0
   }
 
   // Midtrans Snap script loading removed for Custom UI / Core API integration.
@@ -124,7 +124,7 @@ const Checkout = () => {
   }
 
   const ongkir = ongkirDitanggung === 'buyer' ? shippingRates[shippingOption] : 0
-  const totalPembayaran = product.harga + ongkir + 2500 // 2500 is service fee
+  const totalPembayaran = parseInt(product.harga) + parseInt(ongkir) + 0 // 0 service fee for testing
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 pb-16 md:pb-0">
@@ -294,7 +294,7 @@ const Checkout = () => {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Biaya Layanan Platform</span>
-                    <span className="font-medium text-gray-900">{formatCurrency(2500)}</span>
+                    <span className="font-medium text-gray-900">{formatCurrency(0)}</span>
                   </div>
                 </div>
 
