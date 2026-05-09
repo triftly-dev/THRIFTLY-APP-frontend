@@ -152,7 +152,7 @@ const Header = () => {
                       <button className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-100 transition-all outline-none">
                         {user?.avatar ? (
                           <img 
-                            src={`${import.meta.env.VITE_API_URL}/storage/avatars/${user.avatar}`} 
+                            src={`${import.meta.env.VITE_API_URL}/storage/${user.avatar.startsWith('avatars/') ? user.avatar : `avatars/${user.avatar}`}`} 
                             alt="Profile" 
                             className="w-8 h-8 rounded-full object-cover border border-gray-200"
                           />

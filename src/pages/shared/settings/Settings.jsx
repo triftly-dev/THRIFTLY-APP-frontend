@@ -190,7 +190,7 @@ const Settings = () => {
                     <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-md bg-gray-100 flex items-center justify-center">
                       {user?.avatar ? (
                         <img 
-                          src={`https://api.thriftly.my.id/storage/${user.avatar}`} 
+                          src={`${import.meta.env.VITE_API_URL}/storage/${user.avatar.startsWith('avatars/') ? user.avatar : `avatars/${user.avatar}`}`} 
                           alt="Profile" 
                           className="w-full h-full object-cover"
                         />
