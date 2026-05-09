@@ -95,6 +95,24 @@ const Login = () => {
               </Button>
             </form>
 
+            <div className="mt-6 flex items-center justify-between">
+              <span className="border-b w-1/5 lg:w-1/4"></span>
+              <span className="text-xs text-center text-gray-500 uppercase">atau masuk dengan</span>
+              <span className="border-b w-1/5 lg:w-1/4"></span>
+            </div>
+
+            <button
+              onClick={() => window.location.href = 'https://api.thriftly.my.id/api/auth/google'}
+              className="mt-4 w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+            >
+              <img 
+                src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" 
+                className="w-5 h-5 mr-3" 
+                alt="Google" 
+              />
+              Masuk dengan Google
+            </button>
+
             <div className="mt-6 text-center space-y-2">
               <p className="text-sm text-gray-600">
                 Belum punya akun?{' '}

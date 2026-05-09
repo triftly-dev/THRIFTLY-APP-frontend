@@ -6,6 +6,7 @@ import Homepage from '../pages/guest/Homepage'
 import ProductList from '../pages/guest/ProductList'
 import ProductDetail from '../pages/guest/ProductDetail'
 import Login from '../pages/auth/Login'
+import LoginSuccess from '../pages/auth/LoginSuccess'
 import BuyerRegister from '../pages/buyer/BuyerRegister'
 import SellerRegister from '../pages/seller/SellerRegister'
 
@@ -60,6 +61,7 @@ const AppRoutes = () => {
       <Route path="/products" element={<ProductList />} />
       <Route path="/products/:id" element={<ProductDetail />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/login-success" element={<LoginSuccess />} />
       <Route path="/register" element={<BuyerRegister />} />
       <Route path="/register/buyer" element={<BuyerRegister />} />
       <Route path="/register/seller" element={<SellerRegister />} />
