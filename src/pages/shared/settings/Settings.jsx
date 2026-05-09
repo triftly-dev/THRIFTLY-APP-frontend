@@ -43,8 +43,6 @@ const Settings = () => {
     new_password_confirmation: ''
   })
 
-  const [loading, setLoading] = useState(false)
-
   const hasChanges = 
     profileData.name !== user?.name ||
     profileData.email !== user?.email ||
