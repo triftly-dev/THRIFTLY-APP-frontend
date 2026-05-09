@@ -31,6 +31,7 @@ import AdminComplaints from '../pages/admin/AdminComplaints'
 
 import Chat from '../pages/shared/Chat'
 import MyComplaints from '../pages/shared/MyComplaints'
+import Settings from '../pages/shared/settings/Settings'
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth()
@@ -214,6 +215,14 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={['user']}>
             <MyComplaints />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute allowedRoles={['user']}>
+            <Settings />
           </ProtectedRoute>
         }
       />

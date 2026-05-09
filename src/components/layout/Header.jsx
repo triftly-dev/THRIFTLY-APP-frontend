@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { Menu, X, ShoppingBag, User, LogOut, MessageCircle, Package, Search, AlertCircle } from 'lucide-react'
+import { Menu, X, ShoppingBag, User, LogOut, MessageCircle, Package, Search, AlertCircle, Settings } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useApp } from '../../context/AppContext'
@@ -163,13 +163,22 @@ const Header = () => {
                   {isUserMenuOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-soft-lg border border-gray-100 py-2">
                       {(isSeller || isBuyer) && (
-                        <Link 
-                          to="/complaints" 
-                          className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors"
-                          onClick={() => setIsUserMenuOpen(false)}
-                        >
-                          <AlertCircle size={16} /> Pusat Bantuan
-                        </Link>
+                        <>
+                          <Link 
+                            to="/profile" 
+                            className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors"
+                            onClick={() => setIsUserMenuOpen(false)}
+                          >
+                            <Settings size={16} /> Pengaturan Akun
+                          </Link>
+                          <Link 
+                            to="/complaints" 
+                            className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors"
+                            onClick={() => setIsUserMenuOpen(false)}
+                          >
+                            <AlertCircle size={16} /> Pusat Bantuan
+                          </Link>
+                        </>
                       )}
                       <button 
                         onClick={handleLogout}
