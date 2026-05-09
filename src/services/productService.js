@@ -7,12 +7,18 @@ const formatImages = (images) => {
   if (!images) return []
   const imageArray = Array.isArray(images) ? images : JSON.parse(images || '[]')
   return imageArray.map(img => {
-    // Jika sudah URL lengkap, Base64, atau sudah ada path /storage, biarkan saja
-    if (img.startsWith('http') || img.startsWith('data:') || img.startsWith('/storage')) {
-      return img.startsWith('/storage') ? `https://api.thriftly.my.id${img}` : img
+    if (!img) return null
+    // Jika sudah URL lengkap atau Base64, biarkan saja
+    if (img.startsWith('http') || img.startsWith('data:')) {
+      return img
     }
-    return `${STORAGE_URL}products/${img}` 
-  })
+    // Jika path diawali /storage, tambahkan domain saja
+    if (img.startsWith('/storage')) {
+      return `https://api.thriftly.my.id${img}`
+    }
+    // Jika path relatif (data lama), tambahkan storage/products/
+    return `${STORAGE_URL}products/${img.replace(/^\//, '')}` 
+  }).filter(Boolean)
 }
 
 export const productService = {
@@ -51,6 +57,9 @@ export const productService = {
       ...p,
       nama: p.name,
       harga: p.price,
+      deskripsi: p.description,
+      kategori: p.category,
+      kondisi: p.condition,
       fotos: formatImages(p.images),
       isBU: p.is_bu,
       stok: p.stock,
