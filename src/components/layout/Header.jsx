@@ -148,51 +148,57 @@ const Header = () => {
                   </button>
 
                   <div className="relative pl-4 border-l border-gray-200" ref={userMenuRef}>
-                  <button 
-                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                    className="flex items-center space-x-2 hover:bg-gray-50 p-1.5 rounded-lg transition-colors"
-                  >
-                    <div className="bg-gray-100 p-1.5 rounded-full">
-                      <User size={18} className="text-gray-600" />
-                    </div>
-                    <span className="text-sm font-medium text-gray-700 hidden lg:block">
-                      {(user?.name || user?.profile?.nama || 'User').split(' ').slice(0, 2).join(' ')}
-                    </span>
-                  </button>
-
-                  {isUserMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-soft-lg border border-gray-100 py-2">
-                      {(isSeller || isBuyer) && (
-                        <>
-                          <Link 
-                            to="/profile" 
-                            className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors"
-                            onClick={() => setIsUserMenuOpen(false)}
-                          >
-                            <Settings size={16} /> Pengaturan Akun
-                          </Link>
-                          <Link 
-                            to="/complaints" 
-                            className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors"
-                            onClick={() => setIsUserMenuOpen(false)}
-                          >
-                            <AlertCircle size={16} /> Pusat Bantuan
-                          </Link>
-                        </>
-                      )}
-                      <button 
-                        onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 transition-colors"
-                      >
-                        <LogOut size={16} /> {BUTTONS.logout}
+                    <div className="relative group">
+                      <button className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-100 transition-all outline-none">
+                        {user?.avatar ? (
+                          <img 
+                            src={`${import.meta.env.VITE_API_URL}/storage/avatars/${user.avatar}`} 
+                            alt="Profile" 
+                            className="w-8 h-8 rounded-full object-cover border border-gray-200"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 border border-gray-200">
+                            <User size={18} />
+                          </div>
+                        )}
                       </button>
+
+                      <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                        <div className="px-4 py-3 border-b border-gray-50 mb-1">
+                          <p className="text-sm font-bold text-gray-900 truncate">{user?.name}</p>
+                          <p className="text-[10px] text-gray-500 truncate">{user?.email}</p>
+                        </div>
+
+                        <Link 
+                          to="/profile" 
+                          className="flex items-center gap-3 px-4 py-2 text-sm text-gray-600 hover:bg-primary-50 hover:text-primary-600 transition-colors"
+                        >
+                          <Settings size={16} />
+                          <span>Pengaturan Akun</span>
+                        </Link>
+                        <Link 
+                          to="/help" 
+                          className="flex items-center gap-3 px-4 py-2 text-sm text-gray-600 hover:bg-primary-50 hover:text-primary-600 transition-colors"
+                        >
+                          <HelpCircle size={16} />
+                          <span>Pusat Bantuan</span>
+                        </Link>
+                        <div className="border-t border-gray-50 mt-1 pt-1">
+                          <button 
+                            onClick={handleLogout}
+                            className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                          >
+                            <LogOut size={16} />
+                            <span>Keluar</span>
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  )}
+                  </div>
                 </div>
-              </div>
-            </>
-          )}
-        </nav>
+              </>
+            )}
+          </nav>
 
           <button
             className="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"

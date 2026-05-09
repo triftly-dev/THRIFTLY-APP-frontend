@@ -43,6 +43,15 @@ const Settings = () => {
     new_password_confirmation: ''
   })
 
+  const [loading, setLoading] = useState(false)
+
+  const hasChanges = 
+    profileData.name !== user?.name ||
+    profileData.email !== user?.email ||
+    profileData.no_telp !== (user?.no_telp || '') ||
+    profileData.gender !== (user?.gender || 'L') ||
+    profileData.date_of_birth !== (user?.date_of_birth || '')
+
   const [ktp_image, setKtpImage] = useState(null)
 
   const handleProfileSubmit = async (e) => {
@@ -323,15 +332,20 @@ const Settings = () => {
                     </div>
                   </div>
 
-                  <div className="md:col-span-2 pt-4">
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="w-full sm:w-auto px-8 py-3 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition-all disabled:opacity-50"
-                    >
-                      {loading ? 'Menyimpan...' : 'Simpan Perubahan'}
-                    </button>
-                  </div>
+                  <div className="pt-4">
+                  <Button 
+                    type="submit" 
+                    loading={loading}
+                    disabled={!hasChanges}
+                    className={`w-full md:w-auto px-12 py-3 rounded-xl font-bold transition-all ${
+                      !hasChanges 
+                        ? 'bg-gray-300 hover:bg-gray-300 cursor-not-allowed text-gray-500' 
+                        : 'bg-primary-600 hover:bg-primary-700 text-white shadow-lg shadow-primary-200'
+                    }`}
+                  >
+                    Simpan Perubahan
+                  </Button>
+                </div>
                 </form>
               </div>
             )}
