@@ -9,11 +9,13 @@ const LoginSuccess = () => {
     useEffect(() => {
         const token = searchParams.get('token');
         if (token) {
-            // Simpan token ke localStorage
-            localStorage.setItem('auth_token', token);
+            // Gunakan key 'token' (sesuai AuthContext)
+            localStorage.setItem('token', token);
             
-            // Refresh halaman ke home/dashboard agar state Auth terupdate
-            // Menggunakan window.location.href adalah cara termudah untuk merefresh seluruh state aplikasi
+            // Hapus profil lama agar AuthContext terpaksa mengambil yang baru
+            localStorage.removeItem('user_profile');
+            
+            // Redirect
             window.location.href = '/';
         } else {
             navigate('/login');

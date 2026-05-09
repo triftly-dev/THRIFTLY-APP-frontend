@@ -24,12 +24,17 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem('token')
       if (token) {
         try {
-          // *Untuk sementara mengambil dari localStorage agar tampilan tetap jalan:
-          const savedUser = localStorage.getItem('user_profile')
-          if (savedUser) setUser(JSON.parse(savedUser))
+          // Selalu ambil profil terbaru dari server jika ada token
+          const response = await api.get('/user')
+          const userData = response.data
+          
+          setUser(userData)
+          localStorage.setItem('user_profile', JSON.stringify(userData))
         } catch (error) {
+          console.error('Auth verification failed:', error)
           localStorage.removeItem('token')
           localStorage.removeItem('user_profile')
+          setUser(null)
         }
       }
       setLoading(false)
