@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { Menu, X, ShoppingBag, User, LogOut, MessageCircle, Package, Search, AlertCircle, Settings } from 'lucide-react'
+import { Menu, X, ShoppingBag, User, LogOut, MessageCircle, Package, Search, AlertCircle, Settings, HelpCircle } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useApp } from '../../context/AppContext'
