@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../../../context/AuthContext'
 import api from '../../../services/api'
 import toast from 'react-hot-toast'
@@ -14,7 +15,8 @@ import {
   UserCircle,
   Lock,
   Upload,
-  CheckCircle2
+  CheckCircle2,
+  ArrowLeft
 } from 'lucide-react'
 import Button from '../../../components/common/Button'
 
@@ -55,8 +57,8 @@ const Settings = () => {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
       
+      await refreshUser()
       toast.success('Profil berhasil diperbarui')
-      window.location.reload()
     } catch (error) {
       toast.error(error.response?.data?.message || 'Gagal memperbarui profil')
     } finally {
@@ -78,8 +80,8 @@ const Settings = () => {
       await api.post('/user/profile?_method=PUT', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
+      await refreshUser()
       toast.success('Foto profil berhasil diperbarui')
-      window.location.reload()
     } catch (error) {
       toast.error('Gagal mengunggah foto')
     } finally {
@@ -138,6 +140,13 @@ const Settings = () => {
   return (
     <div className="min-h-screen bg-gray-50/50 py-8 md:py-12">
       <div className="container mx-auto px-4 max-w-6xl">
+        <Link 
+          to="/" 
+          className="inline-flex items-center gap-2 text-gray-500 hover:text-primary-600 transition-colors mb-6 group"
+        >
+          <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+          <span className="font-medium">Kembali ke Beranda</span>
+        </Link>
         <h1 className="text-2xl font-bold text-gray-900 mb-8">Pengaturan Akun</h1>
         
         <div className="flex flex-col md:flex-row gap-8">

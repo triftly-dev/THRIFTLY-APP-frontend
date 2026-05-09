@@ -113,7 +113,15 @@ export const AuthProvider = ({ children }) => {
       return { success: false }
     }
   }
-  const refreshUser = async () => { /* TODO */ }
+  const refreshUser = async () => {
+    try {
+      const response = await api.get('/user')
+      setUser(response.data)
+      localStorage.setItem('user_profile', JSON.stringify(response.data))
+    } catch (error) {
+      console.error('Failed to refresh user:', error)
+    }
+  }
 
   const value = useMemo(() => ({
     user,
