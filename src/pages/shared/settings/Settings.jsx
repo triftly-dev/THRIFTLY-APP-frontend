@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../../context/AuthContext'
 import api from '../../../services/api'
 import toast from 'react-hot-toast'
@@ -21,6 +21,7 @@ import {
 import Button from '../../../components/common/Button'
 
 const Settings = () => {
+  const navigate = useNavigate()
   const { user, refreshUser } = useAuth()
   const [activeTab, setActiveTab] = useState('profile')
   const [loading, setLoading] = useState(false)
@@ -241,15 +242,43 @@ const Settings = () => {
 
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-gray-700">Nomor HP</label>
-                    <div className="relative">
-                      <Phone size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                      <input 
-                        type="text"
-                        value={profileData.no_telp}
-                        onChange={(e) => setProfileData({...profileData, no_telp: e.target.value})}
-                        className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none transition-all"
-                        placeholder="0812xxxx"
-                      />
+                    <div className="relative flex gap-2">
+                      <div className="relative flex-1">
+                        <Phone size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input 
+                          type="text"
+                          value={profileData.no_telp}
+                          onChange={(e) => setProfileData({...profileData, no_telp: e.target.value})}
+                          className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none transition-all"
+                          placeholder="0812xxxx"
+                        />
+                      </div>
+                      {user?.no_telp && !user?.phone_verified_at && (
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            try {
+                              setLoading(true)
+                              await api.post('/otp/send', { phone: user.no_telp })
+                              toast.success('OTP terkirim ke WhatsApp')
+                              navigate(`/verify-otp?phone=${user.no_telp}`)
+                            } catch (error) {
+                              toast.error('Gagal mengirim OTP')
+                            } finally {
+                              setLoading(false)
+                            }
+                          }}
+                          className="px-4 py-2 bg-amber-50 text-amber-600 border border-amber-200 rounded-xl text-xs font-bold hover:bg-amber-100 transition-all whitespace-nowrap"
+                        >
+                          Verifikasi
+                        </button>
+                      )}
+                      {user?.phone_verified_at && (
+                        <div className="flex items-center gap-1 text-emerald-600 bg-emerald-50 px-3 rounded-xl border border-emerald-100">
+                          <CheckCircle2 size={14} />
+                          <span className="text-[10px] font-bold uppercase tracking-wider">Verified</span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
