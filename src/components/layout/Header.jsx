@@ -171,7 +171,7 @@ const Header = () => {
                     <div className="max-h-96 overflow-y-auto">
                       {user?.ktp_status === 'rejected' ? (
                         <Link 
-                          to="/shared/settings" 
+                          to="/profile" 
                           onClick={() => setShowNotifications(false)}
                           className="flex gap-4 p-4 hover:bg-gray-50 transition-colors border-l-4 border-l-red-500"
                         >
