@@ -54,12 +54,22 @@ const Settings = () => {
     profileData.date_of_birth !== (user?.date_of_birth || '')
 
   const [ktp_image, setKtpImage] = useState(null)
+  const [ktpPreview, setKtpPreview] = useState(null)
+  const ktpInputRef = useRef(null)
   const [ktpData, setKtpData] = useState({
-    nik: '',
-    name: '',
-    birth_place: '',
-    birth_date: ''
+    nik: user?.ktp_nik || '',
+    name: user?.ktp_name || '',
+    birth_place: user?.ktp_birth_place || '',
+    birth_date: user?.ktp_birth_date || ''
   })
+
+  const handleKtpFileChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      setKtpImage(file)
+      setKtpPreview(URL.createObjectURL(file))
+    }
+  }
 
   const handleProfileSubmit = async (e) => {
     e.preventDefault()
@@ -148,7 +158,10 @@ const Settings = () => {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
       toast.success('KTP berhasil diunggah, menunggu verifikasi admin')
-      refreshUser()
+      await refreshUser()
+      // Reset preview
+      setKtpPreview(null)
+      setKtpImage(null)
     } catch (error) {
       toast.error(error.response?.data?.message || 'Gagal mengunggah KTP')
     } finally {
@@ -454,6 +467,7 @@ const Settings = () => {
                       <div className="w-12 h-12 bg-emerald-500 text-white rounded-full flex items-center justify-center">
                         <CheckCircle2 size={24} />
                       </div>
+                      <div>
                         <h4 className="font-bold text-emerald-900">Akun Terverifikasi</h4>
                         <p className="text-sm text-emerald-700">Data diri Anda telah diverifikasi oleh sistem.</p>
                       </div>
@@ -469,39 +483,120 @@ const Settings = () => {
                       </div>
                     </div>
                   ) : (
-                              className="w-full h-full object-contain bg-gray-100"
-                            />
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                              <p className="text-white text-sm font-bold">Ganti Foto</p>
+                    <div className="space-y-8">
+                      {user?.ktp_status === 'rejected' && (
+                        <div className="bg-rose-50 border border-rose-200 rounded-2xl p-6">
+                          <div className="flex items-center gap-4 mb-4">
+                            <div className="w-12 h-12 bg-rose-500 text-white rounded-full flex items-center justify-center">
+                              <X size={24} />
+                            </div>
+                            <div>
+                              <h4 className="font-bold text-rose-900">Verifikasi Ditolak</h4>
+                              <p className="text-sm text-rose-700">Maaf, pengajuan verifikasi KTP Anda ditolak.</p>
                             </div>
                           </div>
-                        ) : (
-                          <>
-                            <div className="p-4 bg-gray-50 text-gray-400 rounded-full group-hover:text-primary-600 group-hover:bg-primary-50 transition-all">
-                              <Upload size={32} />
-                            </div>
-                            <div className="text-center px-4">
-                              <p className="font-bold text-gray-700">Klik untuk pilih foto KTP</p>
-                              <p className="text-xs text-gray-400 mt-1">Pastikan tulisan terbaca jelas (Maks. 2MB)</p>
-                            </div>
-                          </>
-                        )}
-                        <input 
-                          id="ktp_upload" 
-                          type="file" 
-                          className="hidden" 
-                          accept="image/*"
-                          onChange={(e) => setKtpImage(e.target.files[0])}
-                        />
-                      </div>
+                          <div className="bg-white/50 border border-rose-100 rounded-xl p-4">
+                            <p className="text-xs font-bold text-rose-800 uppercase mb-1">Alasan Penolakan:</p>
+                            <p className="text-sm text-rose-700">{user.ktp_rejection_reason || 'Dokumen tidak sesuai atau kurang jelas.'}</p>
+                          </div>
+                        </div>
+                      )}
 
-                      <button
-                        onClick={handleKtpSubmit}
-                        disabled={loading || !ktp_image}
-                        className="mt-6 w-full sm:w-auto px-8 py-3 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition-all disabled:opacity-50"
-                      >
-                        Kirim untuk Verifikasi
-                      </button>
+                      <div className="max-w-xl space-y-6">
+                        <p className="text-gray-600 text-sm">
+                          {user?.ktp_status === 'rejected' 
+                            ? 'Silakan perbaiki data di bawah dan upload ulang foto KTP yang lebih jelas untuk mengajukan verifikasi kembali.'
+                            : 'Verifikasi KTP diperlukan jika Anda ingin menjadi **Penjual Terpercaya** dan meningkatkan batas penarikan dana.'}
+                        </p>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-gray-500 uppercase">NIK KTP (16 Digit)</label>
+                            <input 
+                              type="text"
+                              maxLength="16"
+                              placeholder="Masukkan 16 digit NIK"
+                              value={ktpData.nik}
+                              onChange={(e) => setKtpData({...ktpData, nik: e.target.value})}
+                              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-gray-500 uppercase">Nama Sesuai KTP</label>
+                            <input 
+                              type="text"
+                              placeholder="Masukkan nama lengkap"
+                              value={ktpData.name}
+                              onChange={(e) => setKtpData({...ktpData, name: e.target.value})}
+                              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-gray-500 uppercase">Tempat Lahir</label>
+                            <input 
+                              type="text"
+                              placeholder="Contoh: Jakarta"
+                              value={ktpData.birth_place}
+                              onChange={(e) => setKtpData({...ktpData, birth_place: e.target.value})}
+                              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-gray-500 uppercase">Tanggal Lahir</label>
+                            <input 
+                              type="date"
+                              value={ktpData.birth_date}
+                              onChange={(e) => setKtpData({...ktpData, birth_date: e.target.value})}
+                              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-gray-500 uppercase">Foto KTP</label>
+                          <div 
+                            className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all cursor-pointer ${
+                              ktpPreview ? 'border-primary-500 bg-primary-50/30' : 'border-gray-200 hover:border-primary-400 hover:bg-gray-50'
+                            }`}
+                            onClick={() => ktpInputRef.current.click()}
+                          >
+                            <input 
+                              type="file"
+                              ref={ktpInputRef}
+                              className="hidden"
+                              accept="image/*"
+                              onChange={handleKtpFileChange}
+                            />
+                            
+                            {ktpPreview ? (
+                              <div className="relative group mx-auto w-full max-w-sm">
+                                <img src={ktpPreview} alt="KTP Preview" className="rounded-lg shadow-md" />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all rounded-lg flex items-center justify-center">
+                                  <p className="text-white font-bold text-sm">Ganti Foto</p>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="space-y-3">
+                                <div className="w-12 h-12 bg-primary-50 text-primary-600 rounded-xl flex items-center justify-center mx-auto">
+                                  <ShoppingBag size={24} />
+                                </div>
+                                <div>
+                                  <p className="text-sm font-bold text-gray-900">Klik untuk upload foto KTP</p>
+                                  <p className="text-xs text-gray-500 mt-1">Format JPG, PNG (Maks 2MB)</p>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={handleKtpSubmit}
+                          disabled={loading || !ktpData.nik || !ktpData.name || !ktp_image}
+                          className="w-full py-3 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary-200"
+                        >
+                          {loading ? 'Mengirim...' : 'Kirim untuk Verifikasi'}
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
