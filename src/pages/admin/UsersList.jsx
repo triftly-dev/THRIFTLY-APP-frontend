@@ -7,8 +7,11 @@ import { useEffect, useState } from 'react'
 import { Eye, Edit, Trash2 } from 'lucide-react'
 import { formatDate } from '../../utils/helpers'
 import toast from 'react-hot-toast'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const UsersList = () => {
+  const navigate = useNavigate()
+  const location = useLocation()
   const [users, setUsers] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingUser, setEditingUser] = useState(null)
@@ -29,6 +32,18 @@ const UsersList = () => {
   useEffect(() => {
     loadUsers()
   }, [])
+
+  // Efek untuk membuka modal verifikasi jika datang dari notifikasi
+  useEffect(() => {
+    if (location.state?.verifyUserId && users.length > 0) {
+      const userToVerify = users.find(u => u.id === location.state.verifyUserId)
+      if (userToVerify) {
+        handleOpenVerifyModal(userToVerify)
+        // Clear state agar tidak terbuka lagi saat refresh
+        window.history.replaceState({}, document.title)
+      }
+    }
+  }, [location.state, users])
 
   const loadUsers = async () => {
     const data = await userService.getAllUsers()
@@ -209,7 +224,10 @@ const UsersList = () => {
       header: 'KTP Status',
       accessor: 'ktp_status',
       render: (row) => {
-        if (!row.ktp_path) return <span className="text-gray-400 text-xs italic">Belum Upload</span>
+        // Jika tidak ada path atau status, berarti belum upload
+        if (!row.ktp_path || !row.ktp_status) {
+          return <span className="text-gray-400 text-xs italic">Belum Upload</span>
+        }
         
         const statusStyles = {
           pending: 'bg-amber-100 text-amber-700 border-amber-200',
