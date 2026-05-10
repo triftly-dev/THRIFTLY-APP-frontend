@@ -460,21 +460,27 @@ const Settings = () => {
                       
                       <div 
                         onClick={() => document.getElementById('ktp_upload').click()}
-                        className="border-2 border-dashed border-gray-200 rounded-2xl p-8 flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-primary-500 hover:bg-primary-50/30 transition-all group"
+                        className="border-2 border-dashed border-gray-200 rounded-2xl p-4 flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-primary-500 hover:bg-primary-50/30 transition-all group min-h-[200px]"
                       >
                         {ktp_image ? (
-                          <div className="text-center">
-                            <p className="font-bold text-primary-600">{ktp_image.name}</p>
-                            <p className="text-xs text-gray-400">Klik untuk mengganti</p>
+                          <div className="relative w-full max-w-sm h-48 rounded-xl overflow-hidden shadow-inner">
+                            <img 
+                              src={URL.createObjectURL(ktp_image)} 
+                              alt="KTP Preview" 
+                              className="w-full h-full object-contain bg-gray-100"
+                            />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <p className="text-white text-sm font-bold">Ganti Foto</p>
+                            </div>
                           </div>
                         ) : (
                           <>
                             <div className="p-4 bg-gray-50 text-gray-400 rounded-full group-hover:text-primary-600 group-hover:bg-primary-50 transition-all">
                               <Upload size={32} />
                             </div>
-                            <div className="text-center">
-                              <p className="font-bold text-gray-700">Klik atau seret foto KTP ke sini</p>
-                              <p className="text-xs text-gray-400">Mendukung format JPG, PNG (Maks. 2MB)</p>
+                            <div className="text-center px-4">
+                              <p className="font-bold text-gray-700">Klik untuk pilih foto KTP</p>
+                              <p className="text-xs text-gray-400 mt-1">Pastikan tulisan terbaca jelas (Maks. 2MB)</p>
                             </div>
                           </>
                         )}
