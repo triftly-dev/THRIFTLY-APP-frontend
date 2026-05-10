@@ -51,6 +51,12 @@ const Settings = () => {
     profileData.date_of_birth !== (user?.date_of_birth || '')
 
   const [ktp_image, setKtpImage] = useState(null)
+  const [ktpData, setKtpData] = useState({
+    nik: '',
+    name: '',
+    birth_place: '',
+    birth_date: ''
+  })
 
   const handleProfileSubmit = async (e) => {
     e.preventDefault()
@@ -122,9 +128,16 @@ const Settings = () => {
   const handleKtpSubmit = async (e) => {
     e.preventDefault()
     if (!ktp_image) return toast.error('Pilih foto KTP terlebih dahulu')
+    if (!ktpData.nik || ktpData.nik.length !== 16) return toast.error('NIK harus 16 digit')
+    if (!ktpData.name) return toast.error('Nama sesuai KTP wajib diisi')
+    if (!ktpData.birth_place || !ktpData.birth_date) return toast.error('Data tempat/tanggal lahir wajib diisi')
 
     const formData = new FormData()
     formData.append('ktp_image', ktp_image)
+    formData.append('ktp_nik', ktpData.nik)
+    formData.append('ktp_name', ktpData.name)
+    formData.append('ktp_birth_place', ktpData.birth_place)
+    formData.append('ktp_birth_date', ktpData.birth_date)
 
     setLoading(true)
     try {
@@ -132,8 +145,9 @@ const Settings = () => {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
       toast.success('KTP berhasil diunggah, menunggu verifikasi admin')
+      refreshUser()
     } catch (error) {
-      toast.error('Gagal mengunggah KTP')
+      toast.error(error.response?.data?.message || 'Gagal mengunggah KTP')
     } finally {
       setLoading(false)
     }
@@ -453,11 +467,54 @@ const Settings = () => {
                       </div>
                     </div>
                   ) : (
-                    <div className="max-w-xl">
-                      <p className="text-gray-600 mb-6 text-sm">
+                    <div className="max-w-xl space-y-6">
+                      <p className="text-gray-600 text-sm">
                         Verifikasi KTP diperlukan jika Anda ingin menjadi **Penjual Terpercaya** dan meningkatkan batas penarikan dana.
                       </p>
                       
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-gray-500 uppercase">NIK KTP (16 Digit)</label>
+                          <input 
+                            type="text"
+                            maxLength="16"
+                            placeholder="Masukkan 16 digit NIK"
+                            value={ktpData.nik}
+                            onChange={(e) => setKtpData({...ktpData, nik: e.target.value})}
+                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-gray-500 uppercase">Nama Sesuai KTP</label>
+                          <input 
+                            type="text"
+                            placeholder="Masukkan nama lengkap"
+                            value={ktpData.name}
+                            onChange={(e) => setKtpData({...ktpData, name: e.target.value})}
+                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-gray-500 uppercase">Tempat Lahir</label>
+                          <input 
+                            type="text"
+                            placeholder="Contoh: Jakarta"
+                            value={ktpData.birth_place}
+                            onChange={(e) => setKtpData({...ktpData, birth_place: e.target.value})}
+                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-gray-500 uppercase">Tanggal Lahir</label>
+                          <input 
+                            type="date"
+                            value={ktpData.birth_date}
+                            onChange={(e) => setKtpData({...ktpData, birth_date: e.target.value})}
+                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none"
+                          />
+                        </div>
+                      </div>
+
                       <div 
                         onClick={() => document.getElementById('ktp_upload').click()}
                         className="border-2 border-dashed border-gray-200 rounded-2xl p-4 flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-primary-500 hover:bg-primary-50/30 transition-all group min-h-[200px]"

@@ -212,6 +212,16 @@ export const userService = {
     const filtered = users.filter(user => user.id !== id)
     storage.set(STORAGE_KEYS.USERS, filtered)
     return true
+  },
+
+  async approveKtp(userId) {
+    const response = await api.put(`/admin/users/${userId}/approve-ktp`)
+    return response.data
+  },
+
+  async rejectKtp(userId, reason) {
+    const response = await api.put(`/admin/users/${userId}/reject-ktp`, { reason })
+    return response.data
   }
 }
 

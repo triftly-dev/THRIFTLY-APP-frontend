@@ -22,6 +22,10 @@ const UsersList = () => {
     alamat: ''
   })
 
+  const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false)
+  const [verifyingUser, setVerifyingUser] = useState(null)
+  const [rejectReason, setRejectReason] = useState('')
+
   useEffect(() => {
     loadUsers()
   }, [])
@@ -29,6 +33,35 @@ const UsersList = () => {
   const loadUsers = async () => {
     const data = await userService.getAllUsers()
     setUsers(data || [])
+  }
+
+  const handleOpenVerifyModal = (user) => {
+    setVerifyingUser(user)
+    setRejectReason('')
+    setIsVerifyModalOpen(true)
+  }
+
+  const handleApprove = async () => {
+    try {
+      await userService.approveKtp(verifyingUser.id)
+      toast.success('KTP berhasil disetujui')
+      setIsVerifyModalOpen(false)
+      loadUsers()
+    } catch (error) {
+      toast.error('Gagal menyetujui KTP')
+    }
+  }
+
+  const handleReject = async () => {
+    if (!rejectReason) return toast.error('Berikan alasan penolakan')
+    try {
+      await userService.rejectKtp(verifyingUser.id, rejectReason)
+      toast.success('KTP telah ditolak')
+      setIsVerifyModalOpen(false)
+      loadUsers()
+    } catch (error) {
+      toast.error('Gagal menolak KTP')
+    }
   }
 
   const handleOpenModal = (user = null) => {
@@ -173,6 +206,35 @@ const UsersList = () => {
       render: (row) => <span className="text-gray-600">{formatDate(row.createdAt)}</span>
     },
     {
+      header: 'KTP Status',
+      accessor: 'ktp_status',
+      render: (row) => {
+        if (!row.ktp_path) return <span className="text-gray-400 text-xs italic">Belum Upload</span>
+        
+        const statusStyles = {
+          pending: 'bg-amber-100 text-amber-700 border-amber-200',
+          verified: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+          rejected: 'bg-rose-100 text-rose-700 border-rose-200'
+        }
+
+        return (
+          <div className="flex flex-col gap-1">
+            <span className={`px-2.5 py-1 text-[10px] font-bold rounded-full border uppercase text-center ${statusStyles[row.ktp_status]}`}>
+              {row.ktp_status}
+            </span>
+            {row.ktp_status === 'pending' && (
+              <button 
+                onClick={() => handleOpenVerifyModal(row)}
+                className="text-[10px] font-bold text-primary-600 hover:underline"
+              >
+                Cek Verifikasi
+              </button>
+            )}
+          </div>
+        )
+      }
+    },
+    {
       header: 'Actions',
       accessor: 'actions',
       className: 'text-right',
@@ -299,6 +361,69 @@ const UsersList = () => {
             </Button>
           </div>
         </form>
+      </Modal>
+      
+      {/* Modal Verifikasi KTP */}
+      <Modal
+        isOpen={isVerifyModalOpen}
+        onClose={() => setIsVerifyModalOpen(false)}
+        title="Detail Verifikasi KTP"
+      >
+        {verifyingUser && (
+          <div className="space-y-6">
+            <div className="aspect-video w-full rounded-xl overflow-hidden border bg-gray-100">
+              <img 
+                src={`${import.meta.env.VITE_API_URL}/storage/${verifyingUser.ktp_path}`}
+                alt="KTP"
+                className="w-full h-full object-contain"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <p className="text-gray-500 text-[10px] font-bold uppercase mb-1">NIK</p>
+                <p className="font-bold text-gray-900">{verifyingUser.ktp_nik || '-'}</p>
+              </div>
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <p className="text-gray-500 text-[10px] font-bold uppercase mb-1">Nama Sesuai KTP</p>
+                <p className="font-bold text-gray-900">{verifyingUser.ktp_name || '-'}</p>
+              </div>
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <p className="text-gray-500 text-[10px] font-bold uppercase mb-1">Tempat Lahir</p>
+                <p className="font-bold text-gray-900">{verifyingUser.ktp_birth_place || '-'}</p>
+              </div>
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <p className="text-gray-500 text-[10px] font-bold uppercase mb-1">Tanggal Lahir</p>
+                <p className="font-bold text-gray-900">{verifyingUser.ktp_birth_date || '-'}</p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-gray-500 uppercase">Alasan Penolakan (Jika ditolak)</label>
+              <textarea 
+                placeholder="Contoh: Foto KTP kurang jelas atau buram"
+                className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-rose-500 outline-none"
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+              />
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button 
+                onClick={handleReject}
+                className="flex-1 py-3 bg-rose-50 text-rose-600 font-bold rounded-xl hover:bg-rose-100 transition-all border border-rose-200"
+              >
+                Tolak Verifikasi
+              </button>
+              <button 
+                onClick={handleApprove}
+                className="flex-1 py-3 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-200"
+              >
+                Terima Verifikasi
+              </button>
+            </div>
+          </div>
+        )}
       </Modal>
     </AdminLayout>
   )
