@@ -451,12 +451,11 @@ const Settings = () => {
                       <div className="w-12 h-12 bg-emerald-500 text-white rounded-full flex items-center justify-center">
                         <CheckCircle2 size={24} />
                       </div>
-                      <div>
                         <h4 className="font-bold text-emerald-900">Akun Terverifikasi</h4>
                         <p className="text-sm text-emerald-700">Data diri Anda telah diverifikasi oleh sistem.</p>
                       </div>
                     </div>
-                  ) : user?.ktp_path ? (
+                  ) : user?.ktp_status === 'pending' ? (
                     <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 flex items-center gap-4">
                       <div className="w-12 h-12 bg-amber-500 text-white rounded-full flex items-center justify-center animate-pulse">
                         <ShieldCheck size={24} />
@@ -467,63 +466,6 @@ const Settings = () => {
                       </div>
                     </div>
                   ) : (
-                    <div className="max-w-xl space-y-6">
-                      <p className="text-gray-600 text-sm">
-                        Verifikasi KTP diperlukan jika Anda ingin menjadi **Penjual Terpercaya** dan meningkatkan batas penarikan dana.
-                      </p>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-gray-500 uppercase">NIK KTP (16 Digit)</label>
-                          <input 
-                            type="text"
-                            maxLength="16"
-                            placeholder="Masukkan 16 digit NIK"
-                            value={ktpData.nik}
-                            onChange={(e) => setKtpData({...ktpData, nik: e.target.value})}
-                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none"
-                          />
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-gray-500 uppercase">Nama Sesuai KTP</label>
-                          <input 
-                            type="text"
-                            placeholder="Masukkan nama lengkap"
-                            value={ktpData.name}
-                            onChange={(e) => setKtpData({...ktpData, name: e.target.value})}
-                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none"
-                          />
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-gray-500 uppercase">Tempat Lahir</label>
-                          <input 
-                            type="text"
-                            placeholder="Contoh: Jakarta"
-                            value={ktpData.birth_place}
-                            onChange={(e) => setKtpData({...ktpData, birth_place: e.target.value})}
-                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none"
-                          />
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-gray-500 uppercase">Tanggal Lahir</label>
-                          <input 
-                            type="date"
-                            value={ktpData.birth_date}
-                            onChange={(e) => setKtpData({...ktpData, birth_date: e.target.value})}
-                            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none"
-                          />
-                        </div>
-                      </div>
-
-                      <div 
-                        onClick={() => document.getElementById('ktp_upload').click()}
-                        className="border-2 border-dashed border-gray-200 rounded-2xl p-4 flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-primary-500 hover:bg-primary-50/30 transition-all group min-h-[200px]"
-                      >
-                        {ktp_image ? (
-                          <div className="relative w-full max-w-sm h-48 rounded-xl overflow-hidden shadow-inner">
-                            <img 
-                              src={URL.createObjectURL(ktp_image)} 
-                              alt="KTP Preview" 
                               className="w-full h-full object-contain bg-gray-100"
                             />
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">

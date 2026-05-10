@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { Menu, X, ShoppingBag, User, LogOut, MessageCircle, Package, Search, AlertCircle, Settings, HelpCircle } from 'lucide-react'
+import { Menu, X, ShoppingBag, User, LogOut, MessageCircle, Package, Search, AlertCircle, Settings, HelpCircle, Bell } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useApp } from '../../context/AppContext'
@@ -14,6 +14,7 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const [showNotifications, setShowNotifications] = useState(false)
   const userMenuRef = useRef(null)
 
   useEffect(() => {
@@ -78,8 +79,20 @@ const Header = () => {
           </div>
 
           <nav className="hidden md:flex items-center space-x-6">
-            <Link to="/products" className="text-gray-600 hover:text-primary-600 font-medium transition-colors">
-              Semua Produk
+            {/* Notifications */}
+            <button 
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="p-2 text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-full transition-colors relative"
+            >
+              <Bell size={20} />
+              {user?.ktp_status === 'rejected' && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+              )}
+            </button>
+
+            {/* Messages */}
+            <Link to="/messages" className="p-2 text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-full transition-colors">
+              <MessageCircle size={20} />
             </Link>
             
             {!user && (
@@ -125,14 +138,60 @@ const Header = () => {
                 )}
 
                 {(isSeller || isBuyer) && (
-                  <Link to="/chat" className="relative cursor-pointer hover:text-primary-600 transition-colors text-gray-600">
-                    <MessageCircle size={22} />
-                    {unreadCount > 0 && (
-                      <Badge variant="accent" size="sm" className="absolute -top-2 -right-2 px-1.5 min-w-[20px]">
-                        {unreadCount}
-                      </Badge>
-                    )}
-                  </Link>
+                  <div className="flex items-center gap-4">
+                    {/* Bell Notification */}
+                    <button 
+                      onClick={() => setShowNotifications(!showNotifications)}
+                      className="relative cursor-pointer hover:text-primary-600 transition-colors text-gray-600"
+                    >
+                      <Bell size={22} />
+                      {user?.ktp_status === 'rejected' && (
+                        <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
+                      )}
+                    </button>
+
+                    {/* Chat */}
+                    <Link to="/chat" className="relative cursor-pointer hover:text-primary-600 transition-colors text-gray-600">
+                      <MessageCircle size={22} />
+                      {unreadCount > 0 && (
+                        <Badge variant="accent" size="sm" className="absolute -top-2 -right-2 px-1.5 min-w-[20px]">
+                          {unreadCount}
+                        </Badge>
+                      )}
+                    </Link>
+                  </div>
+                )}
+
+                {/* Notification Dropdown */}
+                {showNotifications && (
+                  <div className="absolute top-16 right-20 w-80 bg-white border border-gray-100 rounded-2xl shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="p-4 border-bottom border-gray-50">
+                      <h4 className="font-bold text-gray-900">Notifikasi</h4>
+                    </div>
+                    <div className="max-h-96 overflow-y-auto">
+                      {user?.ktp_status === 'rejected' ? (
+                        <Link 
+                          to="/shared/settings" 
+                          onClick={() => setShowNotifications(false)}
+                          className="flex gap-4 p-4 hover:bg-gray-50 transition-colors border-l-4 border-l-red-500"
+                        >
+                          <div className="w-10 h-10 bg-red-100 text-red-600 rounded-full flex items-center justify-center shrink-0">
+                            <AlertCircle size={20} />
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-gray-900">Verifikasi KTP Ditolak</p>
+                            <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                              {user.ktp_rejection_reason || 'Klik untuk melihat alasan dan kirim ulang.'}
+                            </p>
+                          </div>
+                        </Link>
+                      ) : (
+                        <div className="p-8 text-center">
+                          <p className="text-sm text-gray-500">Tidak ada notifikasi baru</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 )}
 
                 <div className="flex items-center gap-3">
