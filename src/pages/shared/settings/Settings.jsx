@@ -265,15 +265,42 @@ const Settings = () => {
 
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-gray-700">Alamat Email</label>
-                    <div className="relative">
-                      <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                      <input 
-                        type="email"
-                        value={profileData.email}
-                        onChange={(e) => setProfileData({...profileData, email: e.target.value})}
-                        className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none transition-all"
-                        placeholder="email@anda.com"
-                      />
+                    <div className="relative flex gap-2">
+                      <div className="relative flex-1">
+                        <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input 
+                          type="email"
+                          value={profileData.email}
+                          onChange={(e) => setProfileData({...profileData, email: e.target.value})}
+                          className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none transition-all"
+                          placeholder="email@anda.com"
+                        />
+                      </div>
+                      {user?.email && !user?.email_verified_at && (
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            try {
+                              setLoading(true)
+                              await api.post('/email/verification-notification')
+                              toast.success('Link verifikasi telah dikirim ke email Anda!')
+                            } catch (error) {
+                              toast.error('Gagal mengirim link verifikasi')
+                            } finally {
+                              setLoading(false)
+                            }
+                          }}
+                          className="px-4 py-2 bg-amber-50 text-amber-600 border border-amber-200 rounded-xl text-xs font-bold hover:bg-amber-100 transition-all whitespace-nowrap"
+                        >
+                          Kirim Link Verifikasi
+                        </button>
+                      )}
+                      {user?.email_verified_at && (
+                        <div className="flex items-center gap-1 text-emerald-600 bg-emerald-50 px-3 rounded-xl border border-emerald-100">
+                          <CheckCircle2 size={14} />
+                          <span className="text-[10px] font-bold uppercase tracking-wider">Verified</span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
