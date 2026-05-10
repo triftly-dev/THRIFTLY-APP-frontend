@@ -442,6 +442,16 @@ const Settings = () => {
                         <p className="text-sm text-emerald-700">Data diri Anda telah diverifikasi oleh sistem.</p>
                       </div>
                     </div>
+                  ) : user?.ktp_path ? (
+                    <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 flex items-center gap-4">
+                      <div className="w-12 h-12 bg-amber-500 text-white rounded-full flex items-center justify-center animate-pulse">
+                        <ShieldCheck size={24} />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-amber-900">Sedang Diverifikasi</h4>
+                        <p className="text-sm text-amber-700">Data KTP Anda sedang dalam proses peninjauan oleh Admin.</p>
+                      </div>
+                    </div>
                   ) : (
                     <div className="max-w-xl">
                       <p className="text-gray-600 mb-6 text-sm">
