@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { Menu, X, ShoppingBag, User, LogOut, MessageCircle, Package, Search, AlertCircle, Settings, HelpCircle, Bell } from 'lucide-react'
+import { Menu, X, ShoppingBag, User, LogOut, MessageCircle, Package, Search, AlertCircle, Settings, HelpCircle, Bell, ShieldCheck } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useApp } from '../../context/AppContext'
@@ -165,7 +165,7 @@ const Header = () => {
                 {/* Notification Dropdown */}
                 {showNotifications && (
                   <div className="absolute top-16 right-20 w-80 bg-white border border-gray-100 rounded-2xl shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <div className="p-4 border-bottom border-gray-50">
+                    <div className="p-4 border-b border-gray-50">
                       <h4 className="font-bold text-gray-900">Notifikasi</h4>
                     </div>
                     <div className="max-h-96 overflow-y-auto">

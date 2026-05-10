@@ -16,7 +16,10 @@ import {
   Lock,
   Upload,
   CheckCircle2,
-  ArrowLeft
+  ArrowLeft,
+  X,
+  ShoppingBag,
+  AlertCircle
 } from 'lucide-react'
 import Button from '../../../components/common/Button'
 
