@@ -22,6 +22,8 @@ import {
   AlertCircle
 } from 'lucide-react'
 import Button from '../../../components/common/Button'
+import Modal from '../../../components/common/Modal'
+import MapPicker from '../../../components/common/MapPicker'
 
 const Settings = () => {
   const navigate = useNavigate()
@@ -37,6 +39,14 @@ const Settings = () => {
     no_telp: user?.no_telp || '',
     gender: user?.gender || '',
     date_of_birth: user?.date_of_birth || '',
+    alamat: user?.alamat || '',
+    lokasi: user?.lokasi || ''
+  })
+
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false)
+  const [tempAddress, setTempAddress] = useState({
+    alamat: user?.alamat || '',
+    lokasi: user?.lokasi || ''
   })
 
   // Security Form State
@@ -174,6 +184,39 @@ const Settings = () => {
     { id: 'address', label: 'Daftar Alamat', icon: MapPin },
     { id: 'security', label: 'Keamanan', icon: ShieldCheck },
   ]
+
+  const handleAddressSubmit = async (e) => {
+    if (e) e.preventDefault()
+    setLoading(true)
+    try {
+      const formData = new FormData()
+      // Send current profile data + updated address
+      Object.keys(profileData).forEach(key => {
+        if (key !== 'alamat' && key !== 'lokasi') {
+          formData.append(key, profileData[key])
+        }
+      })
+      formData.append('alamat', tempAddress.alamat)
+      formData.append('lokasi', tempAddress.lokasi)
+      
+      await api.post('/user/profile?_method=PUT', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+      
+      await refreshUser()
+      setProfileData(prev => ({
+        ...prev,
+        alamat: tempAddress.alamat,
+        lokasi: tempAddress.lokasi
+      }))
+      setIsAddressModalOpen(false)
+      toast.success('Alamat berhasil diperbarui')
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Gagal memperbarui alamat')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50/50 py-8 md:py-12">
@@ -410,18 +453,46 @@ const Settings = () => {
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-lg font-bold text-gray-900">Alamat Saya</h3>
-                  <button className="text-primary-600 text-sm font-bold hover:underline">+ Tambah Alamat Baru</button>
+                  <button 
+                    onClick={() => {
+                      setTempAddress({
+                        alamat: user?.alamat || '',
+                        lokasi: user?.lokasi || ''
+                      })
+                      setIsAddressModalOpen(true)
+                    }}
+                    className="text-primary-600 text-sm font-bold hover:underline"
+                  >
+                    + Tambah Alamat Baru
+                  </button>
                 </div>
                 
                 <div className="space-y-4">
                   <div className="p-4 border border-primary-200 bg-primary-50/30 rounded-2xl relative">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="font-bold text-gray-900">Utama</span>
+                      {user?.lokasi && (
+                        <div className="flex items-center gap-1 text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                          <MapPin size={10} />
+                          Titik Map Terpasang
+                        </div>
+                      )}
                     </div>
                     <p className="text-sm text-gray-800 font-medium">{user?.name}</p>
                     <p className="text-sm text-gray-600">{user?.no_telp}</p>
                     <p className="text-sm text-gray-600 mt-2">{user?.alamat || 'Belum ada alamat'}</p>
-                    <button className="mt-3 text-sm font-bold text-primary-600">Ubah Alamat</button>
+                    <button 
+                      onClick={() => {
+                        setTempAddress({
+                          alamat: user?.alamat || '',
+                          lokasi: user?.lokasi || ''
+                        })
+                        setIsAddressModalOpen(true)
+                      }}
+                      className="mt-3 text-sm font-bold text-primary-600 hover:text-primary-700 transition-colors"
+                    >
+                      Ubah Alamat
+                    </button>
                   </div>
                 </div>
               </div>
@@ -634,6 +705,57 @@ const Settings = () => {
           </div>
         </div>
       </div>
+
+      {/* Address Edit Modal */}
+      <Modal
+        isOpen={isAddressModalOpen}
+        onClose={() => setIsAddressModalOpen(false)}
+        title="Ubah Alamat Pengiriman"
+        size="lg"
+      >
+        <form onSubmit={handleAddressSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-gray-700">Alamat Lengkap</label>
+            <textarea
+              value={tempAddress.alamat}
+              onChange={(e) => setTempAddress({ ...tempAddress, alamat: e.target.value })}
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none transition-all min-h-[100px]"
+              placeholder="Masukkan alamat lengkap (Jalan, No Rumah, RT/RW, Kecamatan, dsb)"
+              required
+            />
+          </div>
+
+          <MapPicker
+            defaultLat={tempAddress.lokasi ? parseFloat(tempAddress.lokasi.split(',')[0]) : null}
+            defaultLng={tempAddress.lokasi ? parseFloat(tempAddress.lokasi.split(',')[1]) : null}
+            onLocationChange={(loc) => {
+              setTempAddress({
+                ...tempAddress,
+                alamat: loc.address || tempAddress.alamat,
+                lokasi: `${loc.lat},${loc.lng}`
+              })
+            }}
+          />
+
+          <div className="flex gap-3 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="flex-1 py-3"
+              onClick={() => setIsAddressModalOpen(false)}
+            >
+              Batal
+            </Button>
+            <Button
+              type="submit"
+              loading={loading}
+              className="flex-1 py-3 bg-primary-600 text-white"
+            >
+              Simpan Alamat
+            </Button>
+          </div>
+        </form>
+      </Modal>
     </div>
   )
 }
