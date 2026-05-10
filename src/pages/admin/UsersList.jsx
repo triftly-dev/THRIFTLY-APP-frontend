@@ -31,6 +31,8 @@ const UsersList = () => {
 
   useEffect(() => {
     loadUsers()
+    const interval = setInterval(loadUsers, 30000) // Poll every 30 seconds
+    return () => clearInterval(interval)
   }, [])
 
   // Efek untuk membuka modal verifikasi jika datang dari notifikasi

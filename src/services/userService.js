@@ -10,6 +10,12 @@ export const userService = {
       return response.data.map(user => ({
         ...user,
         createdAt: user.created_at,
+        ktp_path: user.ktp_path,
+        ktp_status: user.ktp_status,
+        ktp_nik: user.ktp_nik,
+        ktp_name: user.ktp_name,
+        ktp_birth_place: user.ktp_birth_place,
+        ktp_birth_date: user.ktp_birth_date,
         profile: {
           nama: user.name,
           lokasi: user.lokasi || 'N/A'
