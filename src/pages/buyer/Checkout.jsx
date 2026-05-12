@@ -14,6 +14,8 @@ import { transactionService } from '../../services/transactionService'
 import api from '../../services/api'
 import { formatCurrency } from '../../utils/helpers'
 import { ALL_LOCATIONS } from '../../constants/locations'
+import MapPicker from '../../components/common/MapPicker'
+import Modal from '../../components/common/Modal'
 
 const Checkout = () => {
   const { productId } = useParams()
@@ -34,6 +36,7 @@ const Checkout = () => {
   
   // Alamat Edit States
   const [isEditingAddress, setIsEditingAddress] = useState(false)
+  const [showMapModal, setShowMapModal] = useState(false)
   const [addressForm, setAddressForm] = useState({
     alamat: user?.alamat || user?.profile?.alamat || '',
     lokasi: user?.lokasi || user?.profile?.lokasi || ''
@@ -111,6 +114,14 @@ const Checkout = () => {
     } finally {
       setIsUpdatingAddress(false)
     }
+  }
+
+  const handleMapSelect = (selectedData) => {
+    setAddressForm({
+      ...addressForm,
+      alamat: selectedData.address
+    })
+    setShowMapModal(false)
   }
 
   const handleCheckout = async () => {
@@ -215,15 +226,22 @@ const Checkout = () => {
 
                   {isEditingAddress ? (
                     <div className="mt-3 space-y-3">
-                      <div>
+                      <div className="flex justify-between items-end">
                         <label className="text-[10px] font-bold text-gray-400 uppercase">Alamat Lengkap</label>
-                        <textarea 
-                          value={addressForm.alamat}
-                          onChange={(e) => setAddressForm({...addressForm, alamat: e.target.value})}
-                          className="w-full mt-1 p-3 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none min-h-[80px]"
-                          placeholder="Masukkan alamat lengkap pengiriman..."
-                        />
+                        <button 
+                          onClick={() => setShowMapModal(true)}
+                          className="flex items-center gap-1 text-[10px] font-bold text-primary-600 hover:underline"
+                        >
+                          <MapPin size={12} />
+                          Pilih dari Peta
+                        </button>
                       </div>
+                      <textarea 
+                        value={addressForm.alamat}
+                        onChange={(e) => setAddressForm({...addressForm, alamat: e.target.value})}
+                        className="w-full mt-1 p-3 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none min-h-[80px]"
+                        placeholder="Masukkan alamat lengkap pengiriman..."
+                      />
                       <div>
                         <label className="text-[10px] font-bold text-gray-400 uppercase">Kota/Kabupaten</label>
                         <select 
@@ -448,6 +466,21 @@ const Checkout = () => {
       </main>
 
       <Footer />
+
+      {/* MODAL PETA */}
+      <Modal
+        isOpen={showMapModal}
+        onClose={() => setShowMapModal(false)}
+        title="Pilih Lokasi Pengiriman"
+        maxWidth="max-w-4xl"
+      >
+        <div className="h-[500px]">
+          <MapPicker 
+            onSelect={handleMapSelect}
+            initialAddress={addressForm.alamat}
+          />
+        </div>
+      </Modal>
     </div>
   )
 }
