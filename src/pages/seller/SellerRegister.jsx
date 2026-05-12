@@ -63,18 +63,16 @@ const SellerRegister = () => {
   const onSubmit = async (data) => {
     setLoading(true)
     const result = await registerUser({
+      name: data.nama,
       email: data.email,
       password: data.password,
-      role: 'seller',
-      profile: {
-        nama: data.nama,
-        ttl: data.ttl,
-        noTelp: data.noTelp,
-        alamat: data.alamat,
-        lokasi: data.lokasi,
-        noRekening: data.noRekening,
-        ktpUrl: data.ktpUrl
-      }
+      no_telp: data.noTelp,
+      alamat: data.alamat,
+      lokasi: data.lokasi,
+      date_of_birth: data.ttl,
+      no_rekening: data.noRekening,
+      ktp_url: data.ktpUrl,
+      role: 'seller'
     })
     setLoading(false)
 

@@ -27,15 +27,13 @@ const BuyerRegister = () => {
   const onSubmit = async (data) => {
     setLoading(true)
     const result = await registerUser({
+      name: data.nama,
       email: data.email,
       password: data.password,
-      role: 'buyer',
-      profile: {
-        nama: data.nama,
-        noTelp: data.noTelp,
-        alamat: data.alamat,
-        lokasi: data.lokasi
-      }
+      no_telp: data.noTelp,
+      alamat: data.alamat,
+      lokasi: data.lokasi,
+      role: 'buyer'
     })
     setLoading(false)
 

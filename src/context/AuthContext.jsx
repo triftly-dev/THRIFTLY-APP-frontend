@@ -72,12 +72,14 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       const payload = {
-        name: userData.profile?.nama || 'Pengguna Baru',
+        name: userData.name || userData.profile?.nama || 'Pengguna Baru',
         email: userData.email,
         password: userData.password,
         password_confirmation: userData.password,
-        role: 'buyer',
-        profile: userData.profile
+        no_telp: userData.no_telp || userData.profile?.noTelp,
+        alamat: userData.alamat || userData.profile?.alamat,
+        lokasi: userData.lokasi || userData.profile?.lokasi,
+        role: userData.role || 'buyer'
       };
 
       const response = await api.post('/register', payload)
