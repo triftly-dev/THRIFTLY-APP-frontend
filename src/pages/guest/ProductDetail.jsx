@@ -28,6 +28,7 @@ const ProductDetail = () => {
   const [isVerifModalOpen, setIsVerifModalOpen] = useState(false)
   const [verifStep, setVerifStep] = useState('status') // 'status', 'otp'
   const [otpCode, setOtpCode] = useState('')
+  const [newPhone, setNewPhone] = useState('')
   const [countdownEmail, setCountdownEmail] = useState(0)
   const [countdownPhone, setCountdownPhone] = useState(0)
   const [verifying, setVerifying] = useState(false)
@@ -135,19 +136,28 @@ const ProductDetail = () => {
   }
 
   const handleSendOTP = async () => {
-    if (!user.no_telp) {
-      toast.error('Nomor telepon belum diatur di profil')
-      navigate('/user/settings')
+    const targetPhone = user.no_telp || newPhone
+    
+    if (!targetPhone) {
+      setVerifStep('input_phone')
       return
     }
+
     try {
       setVerifying(true)
-      await api.post('/otp/send', { phone: user.no_telp })
+      
+      // Jika nomor baru diinput, update dulu ke profil (opsional, tapi bagus agar sinkron)
+      if (newPhone && newPhone !== user.no_telp) {
+        await api.put('/user/profile', { no_telp: newPhone })
+        await refreshUser()
+      }
+
+      await api.post('/otp/send', { phone: targetPhone })
       toast.success('Kode OTP dikirim ke WhatsApp')
       setCountdownPhone(60)
       setVerifStep('otp')
     } catch (error) {
-      toast.error('Gagal mengirim OTP')
+      toast.error('Gagal mengirim OTP. Pastikan nomor benar.')
     } finally {
       setVerifying(false)
     }
@@ -155,9 +165,10 @@ const ProductDetail = () => {
 
   const handleVerifyOTP = async () => {
     if (otpCode.length !== 6) return toast.error('OTP harus 6 digit')
+    const targetPhone = user.no_telp || newPhone
     try {
       setVerifying(true)
-      await api.post('/otp/verify', { phone: user.no_telp, otp: otpCode })
+      await api.post('/otp/verify', { phone: targetPhone, otp: otpCode })
       toast.success('Nomor HP berhasil diverifikasi!')
       await refreshUser()
       setVerifStep('status')
@@ -469,6 +480,40 @@ const ProductDetail = () => {
                   </div>
 
                   <p className="text-[10px] text-center text-gray-400 mt-4 italic">*Refresh halaman setelah verifikasi email berhasil.</p>
+                </div>
+              ) : verifStep === 'input_phone' ? (
+                <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+                  <div className="text-center">
+                    <h4 className="font-bold text-gray-900">Input Nomor WhatsApp</h4>
+                    <p className="text-sm text-gray-500 mt-1">Masukkan nomor WhatsApp aktif untuk menerima kode OTP.</p>
+                  </div>
+                  
+                  <div className="relative">
+                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                    <input 
+                      type="tel" 
+                      value={newPhone}
+                      onChange={(e) => setNewPhone(e.target.value.replace(/[^0-9]/g, ''))}
+                      className="w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:border-primary-500 outline-none transition-all font-bold text-lg"
+                      placeholder="0812xxxxxxxx"
+                    />
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button 
+                      onClick={() => setVerifStep('status')}
+                      className="flex-1 py-3 font-bold text-gray-500 hover:bg-gray-100 rounded-xl transition-all"
+                    >
+                      Batal
+                    </button>
+                    <button 
+                      disabled={verifying || newPhone.length < 10}
+                      onClick={handleSendOTP}
+                      className="flex-1 py-3 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 disabled:bg-gray-300 transition-all shadow-lg shadow-primary-100"
+                    >
+                      {verifying ? "Proses..." : "Kirim OTP"}
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
