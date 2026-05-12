@@ -535,6 +535,22 @@ const ProductDetail = () => {
                     placeholder="000000"
                   />
 
+                  <div className="text-center">
+                    {countdownPhone > 0 ? (
+                      <p className="text-sm text-gray-500">
+                        Kirim ulang dalam <span className="font-bold text-primary-600">{countdownPhone}s</span>
+                      </p>
+                    ) : (
+                      <button 
+                        onClick={handleSendOTP}
+                        disabled={verifying}
+                        className="text-sm font-bold text-primary-600 hover:underline"
+                      >
+                        Kirim Ulang OTP
+                      </button>
+                    )}
+                  </div>
+
                   <div className="flex gap-3">
                     <button 
                       onClick={() => setVerifStep('status')}
