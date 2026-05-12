@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { MapPin, MessageCircle, ChevronLeft, ChevronRight, ShieldCheck, Truck, Star, ShoppingBag } from 'lucide-react'
+import { MapPin, MessageCircle, ChevronLeft, ChevronRight, ShieldCheck, Truck, Star, ShoppingBag, X, Mail, Phone } from 'lucide-react'
+import api from '../../services/api'
 import Header from '../../components/layout/Header'
 import Footer from '../../components/layout/Footer'
 import Container from '../../components/layout/Container'
@@ -19,11 +20,17 @@ import toast from 'react-hot-toast'
 const ProductDetail = () => {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { user, isBuyer } = useAuth()
+  const { user, isBuyer, refreshUser } = useAuth()
   const [product, setProduct] = useState(null)
   const [seller, setSeller] = useState(null)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [isVerifModalOpen, setIsVerifModalOpen] = useState(false)
+  const [verifStep, setVerifStep] = useState('status') // 'status', 'otp'
+  const [otpCode, setOtpCode] = useState('')
+  const [countdownEmail, setCountdownEmail] = useState(0)
+  const [countdownPhone, setCountdownPhone] = useState(0)
+  const [verifying, setVerifying] = useState(false)
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -59,6 +66,21 @@ const ProductDetail = () => {
     fetchProduct()
   }, [id, navigate])
 
+  // Timer Logic for Countdowns
+  useEffect(() => {
+    let timerEmail, timerPhone
+    if (countdownEmail > 0) {
+      timerEmail = setInterval(() => setCountdownEmail(prev => prev - 1), 1000)
+    }
+    if (countdownPhone > 0) {
+      timerPhone = setInterval(() => setCountdownPhone(prev => prev - 1), 1000)
+    }
+    return () => {
+      clearInterval(timerEmail)
+      clearInterval(timerPhone)
+    }
+  }, [countdownEmail, countdownPhone])
+
   const handleChat = () => {
     if (!user) {
       toast.error('Login dulu ya buat chat!')
@@ -86,7 +108,64 @@ const ProductDetail = () => {
       return
     }
 
+    // CEK VERIFIKASI
+    const needsEmailVerif = !user.google_id && !user.email_verified_at
+    const needsPhoneVerif = !user.phone_verified_at
+
+    if (needsEmailVerif || needsPhoneVerif) {
+      setVerifStep('status')
+      setIsVerifModalOpen(true)
+      return
+    }
+
     navigate(`/checkout/${product.id}`)
+  }
+
+  const handleSendEmail = async () => {
+    try {
+      setVerifying(true)
+      await api.post('/email/verification-notification')
+      toast.success('Link verifikasi dikirim ke email Anda')
+      setCountdownEmail(60)
+    } catch (error) {
+      toast.error('Gagal mengirim email')
+    } finally {
+      setVerifying(false)
+    }
+  }
+
+  const handleSendOTP = async () => {
+    if (!user.no_telp) {
+      toast.error('Nomor telepon belum diatur di profil')
+      navigate('/user/settings')
+      return
+    }
+    try {
+      setVerifying(true)
+      await api.post('/otp/send', { phone: user.no_telp })
+      toast.success('Kode OTP dikirim ke WhatsApp')
+      setCountdownPhone(60)
+      setVerifStep('otp')
+    } catch (error) {
+      toast.error('Gagal mengirim OTP')
+    } finally {
+      setVerifying(false)
+    }
+  }
+
+  const handleVerifyOTP = async () => {
+    if (otpCode.length !== 6) return toast.error('OTP harus 6 digit')
+    try {
+      setVerifying(true)
+      await api.post('/otp/verify', { phone: user.no_telp, otp: otpCode })
+      toast.success('Nomor HP berhasil diverifikasi!')
+      await refreshUser()
+      setVerifStep('status')
+    } catch (error) {
+      toast.error('Kode OTP salah atau kadaluarsa')
+    } finally {
+      setVerifying(false)
+    }
   }
 
   const nextImage = () => {
@@ -321,6 +400,113 @@ const ProductDetail = () => {
       </Container>
 
       <Footer />
+
+      {/* MODAL VERIFIKASI DOKUMEN */}
+      {isVerifModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+              <h3 className="font-bold text-gray-900 text-lg">Lengkapi Verifikasi</h3>
+              <button onClick={() => setIsVerifModalOpen(false)} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
+                <X size={20} className="text-gray-500" />
+              </button>
+            </div>
+
+            <div className="p-8">
+              {verifStep === 'status' ? (
+                <div className="space-y-6">
+                  <div className="text-center mb-6">
+                    <div className="w-16 h-16 bg-primary-100 text-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <ShieldCheck size={32} />
+                    </div>
+                    <p className="text-gray-600">Keamanan kamu prioritas kami. Silakan lengkapi verifikasi berikut untuk belanja.</p>
+                  </div>
+
+                  {/* Verifikasi Email (Hanya manual user) */}
+                  {!user.google_id && (
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                      <div className="flex items-center gap-3">
+                        <Mail className={user.email_verified_at ? "text-emerald-500" : "text-gray-400"} size={20} />
+                        <div>
+                          <p className="text-sm font-bold text-gray-900">Email</p>
+                          <p className="text-[10px] text-gray-500">{user.email}</p>
+                        </div>
+                      </div>
+                      {user.email_verified_at ? (
+                        <Badge variant="success" size="sm">Verified</Badge>
+                      ) : (
+                        <button 
+                          disabled={verifying || countdownEmail > 0}
+                          onClick={handleSendEmail}
+                          className="text-[11px] font-bold text-primary-600 hover:underline disabled:text-gray-400"
+                        >
+                          {countdownEmail > 0 ? `Tunggu ${countdownEmail}s` : "Verifikasi"}
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Verifikasi No HP */}
+                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                    <div className="flex items-center gap-3">
+                      <Phone className={user.phone_verified_at ? "text-emerald-500" : "text-gray-400"} size={20} />
+                      <div>
+                        <p className="text-sm font-bold text-gray-900">Nomor WhatsApp</p>
+                        <p className="text-[10px] text-gray-500">{user.no_telp || 'Belum diatur'}</p>
+                      </div>
+                    </div>
+                    {user.phone_verified_at ? (
+                      <Badge variant="success" size="sm">Verified</Badge>
+                    ) : (
+                      <button 
+                        disabled={verifying || countdownPhone > 0}
+                        onClick={handleSendOTP}
+                        className="text-[11px] font-bold text-primary-600 hover:underline disabled:text-gray-400"
+                      >
+                        {countdownPhone > 0 ? `Tunggu ${countdownPhone}s` : "Verifikasi"}
+                      </button>
+                    )}
+                  </div>
+
+                  <p className="text-[10px] text-center text-gray-400 mt-4 italic">*Refresh halaman setelah verifikasi email berhasil.</p>
+                </div>
+              ) : (
+                <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+                  <div className="text-center">
+                    <h4 className="font-bold text-gray-900">Masukkan Kode OTP</h4>
+                    <p className="text-sm text-gray-500 mt-1">Kode 6 digit dikirim ke WhatsApp Anda.</p>
+                  </div>
+                  
+                  <input 
+                    type="text" 
+                    maxLength={6}
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/[^0-9]/g, ''))}
+                    className="w-full text-center text-3xl font-bold tracking-[1em] py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:border-primary-500 outline-none transition-all"
+                    placeholder="000000"
+                  />
+
+                  <div className="flex gap-3">
+                    <button 
+                      onClick={() => setVerifStep('status')}
+                      className="flex-1 py-3 font-bold text-gray-500 hover:bg-gray-100 rounded-xl transition-all"
+                    >
+                      Kembali
+                    </button>
+                    <button 
+                      disabled={verifying || otpCode.length !== 6}
+                      onClick={handleVerifyOTP}
+                      className="flex-1 py-3 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 disabled:bg-gray-300 transition-all shadow-lg shadow-primary-100"
+                    >
+                      {verifying ? "Proses..." : "Verifikasi"}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
