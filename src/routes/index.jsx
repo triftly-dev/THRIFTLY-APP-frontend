@@ -10,6 +10,10 @@ import LoginSuccess from '../pages/auth/LoginSuccess'
 import BuyerRegister from '../pages/buyer/BuyerRegister'
 import SellerRegister from '../pages/seller/SellerRegister'
 import VerifyOTP from '../pages/auth/VerifyOTP'
+import About from '../pages/guest/About'
+import Terms from '../pages/guest/Terms'
+import Privacy from '../pages/guest/Privacy'
+import Contact from '../pages/guest/Contact'
 
 import BuyerDashboard from '../pages/buyer/BuyerDashboard'
 import MyOrders from '../pages/buyer/MyOrders'
@@ -68,6 +72,11 @@ const AppRoutes = () => {
       <Route path="/register/buyer" element={<BuyerRegister />} />
       <Route path="/register/seller" element={<SellerRegister />} />
       <Route path="/verify-otp" element={<VerifyOTP />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/help" element={<Contact />} />
 
       {/* --- Rute untuk aktifitas pembeli --- */}
       <Route

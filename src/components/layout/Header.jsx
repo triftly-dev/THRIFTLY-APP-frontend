@@ -57,7 +57,7 @@ const Header = () => {
             <div className="bg-primary-50 p-1.5 md:p-2 rounded-xl group-hover:bg-primary-100 transition-colors">
               <ShoppingBag className="text-primary-600 w-6 h-6 md:w-7 md:h-7" />
             </div>
-            <span className="text-xl md:text-2xl font-bold text-gray-900 tracking-tight">Stuffus</span>
+            <span className="text-xl md:text-2xl font-bold text-gray-900 tracking-tight">Thriftly</span>
           </Link>
 
           <div className="hidden md:flex flex-1 max-w-xl mx-8">

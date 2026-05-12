@@ -62,7 +62,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center space-x-3 text-gray-600">
                 <Mail size={20} className="text-primary-600 flex-shrink-0" />
-                <span>halo@stuffus.com</span>
+                <span>support@thriftly.my.id</span>
               </li>
             </ul>
           </div>
@@ -70,12 +70,12 @@ const Footer = () => {
 
         <div className="border-t border-gray-200 pt-8 flex flex-col justify-center items-center gap-4 text-center">
           <div className="flex space-x-6 text-sm text-gray-500 mb-2">
-            <span>Pembayaran Aman</span>
+            <span>Pembayaran Aman by Midtrans</span>
             <span>Penjual Terverifikasi</span>
             <span>Pengiriman Cepat</span>
           </div>
           <p className="text-sm text-gray-500">
-            &copy; {new Date().getFullYear()} Stuffus Marketplace. Hak Cipta Dilindungi.
+            &copy; {new Date().getFullYear()} Thriftly Marketplace. Hak Cipta Dilindungi.
           </p>
         </div>
       </div>
