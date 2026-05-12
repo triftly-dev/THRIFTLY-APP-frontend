@@ -13,6 +13,7 @@ import { userService } from '../../services/userService'
 import { transactionService } from '../../services/transactionService'
 import api from '../../services/api'
 import { formatCurrency } from '../../utils/helpers'
+import { ALL_LOCATIONS } from '../../constants/locations'
 
 const Checkout = () => {
   const { productId } = useParams()
@@ -30,6 +31,24 @@ const Checkout = () => {
   
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [transactionData, setTransactionData] = useState(null)
+  
+  // Alamat Edit States
+  const [isEditingAddress, setIsEditingAddress] = useState(false)
+  const [addressForm, setAddressForm] = useState({
+    alamat: user?.alamat || user?.profile?.alamat || '',
+    lokasi: user?.lokasi || user?.profile?.lokasi || ''
+  })
+  const [isUpdatingAddress, setIsUpdatingAddress] = useState(false)
+  const { refreshUser } = useAuth()
+
+  useEffect(() => {
+    if (user) {
+      setAddressForm({
+        alamat: user.alamat || user.profile?.alamat || '',
+        lokasi: user.lokasi || user.profile?.lokasi || ''
+      })
+    }
+  }, [user])
 
   const shippingRates = {
     reguler: 0,
@@ -69,6 +88,30 @@ const Checkout = () => {
 
     fetchData()
   }, [productId, navigate])
+
+  const handleUpdateAddress = async () => {
+    if (!addressForm.alamat || !addressForm.lokasi) {
+      toast.error('Alamat dan Lokasi wajib diisi')
+      return
+    }
+
+    setIsUpdatingAddress(true)
+    try {
+      await api.put('/user/profile', {
+        name: user.name,
+        email: user.email,
+        alamat: addressForm.alamat,
+        lokasi: addressForm.lokasi
+      })
+      await refreshUser()
+      setIsEditingAddress(false)
+      toast.success('Alamat berhasil diperbarui')
+    } catch (error) {
+      toast.error('Gagal memperbarui alamat')
+    } finally {
+      setIsUpdatingAddress(false)
+    }
+  }
 
   const handleCheckout = async () => {
     const userAddress = user?.alamat || user?.profile?.alamat;
@@ -150,11 +193,72 @@ const Checkout = () => {
                       <p className="font-semibold text-gray-900">{user.name || user.profile?.nama}</p>
                       <p className="text-sm text-gray-500">{user.no_telp || user.profile?.noTelp || '-'}</p>
                     </div>
-                    <span className="bg-primary-50 text-primary-700 text-xs font-medium px-2.5 py-1 rounded-full">Utama</span>
+                    <div className="flex gap-2">
+                      {!isEditingAddress ? (
+                        <button 
+                          onClick={() => setIsEditingAddress(true)}
+                          className="text-xs font-bold text-primary-600 hover:bg-primary-50 px-3 py-1 rounded-lg border border-primary-100 transition-all"
+                        >
+                          Ubah
+                        </button>
+                      ) : (
+                        <button 
+                          onClick={() => setIsEditingAddress(false)}
+                          className="text-xs font-bold text-gray-500 hover:bg-gray-50 px-3 py-1 rounded-lg border border-gray-200 transition-all"
+                        >
+                          Batal
+                        </button>
+                      )}
+                      <span className="bg-primary-50 text-primary-700 text-xs font-medium px-2.5 py-1 rounded-full">Utama</span>
+                    </div>
                   </div>
-                  <p className="text-sm text-gray-700 mt-2">
-                    {user.alamat || user.profile?.alamat || 'Alamat belum diatur. Silakan update profil Anda di Pengaturan dasbor.'}
-                  </p>
+
+                  {isEditingAddress ? (
+                    <div className="mt-3 space-y-3">
+                      <div>
+                        <label className="text-[10px] font-bold text-gray-400 uppercase">Alamat Lengkap</label>
+                        <textarea 
+                          value={addressForm.alamat}
+                          onChange={(e) => setAddressForm({...addressForm, alamat: e.target.value})}
+                          className="w-full mt-1 p-3 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none min-h-[80px]"
+                          placeholder="Masukkan alamat lengkap pengiriman..."
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-gray-400 uppercase">Kota/Kabupaten</label>
+                        <select 
+                          value={addressForm.lokasi}
+                          onChange={(e) => setAddressForm({...addressForm, lokasi: e.target.value})}
+                          className="w-full mt-1 p-3 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                        >
+                          <option value="">Pilih Lokasi</option>
+                          <optgroup label="DI Yogyakarta">
+                            {ALL_LOCATIONS.filter(loc => loc.provinsi === 'DI Yogyakarta').map(loc => (
+                              <option key={loc.id} value={loc.id}>{loc.nama}</option>
+                            ))}
+                          </optgroup>
+                          <optgroup label="Jawa Tengah">
+                            {ALL_LOCATIONS.filter(loc => loc.provinsi === 'Jawa Tengah').map(loc => (
+                              <option key={loc.id} value={loc.id}>{loc.nama}</option>
+                            ))}
+                          </optgroup>
+                        </select>
+                      </div>
+                      <Button 
+                        fullWidth 
+                        size="sm" 
+                        onClick={handleUpdateAddress}
+                        loading={isUpdatingAddress}
+                        disabled={isUpdatingAddress}
+                      >
+                        Simpan Alamat Baru
+                      </Button>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-700 mt-2">
+                      {user.alamat || user.profile?.alamat || 'Alamat belum diatur. Silakan klik "Ubah" untuk melengkapi.'}
+                    </p>
+                  )}
                 </div>
               </div>
 
