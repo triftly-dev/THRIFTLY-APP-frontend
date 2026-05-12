@@ -15,7 +15,6 @@ import api from '../../services/api'
 import { formatCurrency } from '../../utils/helpers'
 import { ALL_LOCATIONS } from '../../constants/locations'
 import MapPicker from '../../components/common/MapPicker'
-import Modal from '../../components/common/Modal'
 
 const Checkout = () => {
   const { productId } = useParams()
