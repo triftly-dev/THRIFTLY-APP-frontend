@@ -172,7 +172,7 @@ const ProductDetail = () => {
     const targetPhone = user.no_telp || newPhone
     try {
       setVerifying(true)
-      await api.post('/otp/verify', { phone: targetPhone, otp: otpCode })
+      await api.post('/otp/verify', { phone: targetPhone, code: otpCode })
       toast.success('Nomor HP berhasil diverifikasi!')
       await refreshUser()
       setVerifStep('status')
