@@ -31,13 +31,14 @@ const Settings = () => {
   const [activeTab, setActiveTab] = useState('profile')
   const [loading, setLoading] = useState(false)
   const fileInputRef = useRef(null)
+  const [countdown, setCountdown] = useState(0)
 
   // Profile Form State
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
     email: user?.email || '',
     no_telp: user?.no_telp || '',
-    gender: user?.gender || '',
+    gender: user?.gender || 'L',
     date_of_birth: user?.date_of_birth || '',
     alamat: user?.alamat || '',
     lokasi: user?.lokasi || ''
@@ -56,9 +57,35 @@ const Settings = () => {
     new_password_confirmation: ''
   })
 
+  // Timer Logic
+  useEffect(() => {
+    let timer
+    if (countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prev) => prev - 1)
+      }, 1000)
+    }
+    return () => clearInterval(timer)
+  }, [countdown])
+
+  // Reset profileData when user changes from context
+  useEffect(() => {
+    if (user) {
+      setProfileData({
+        name: user.name || '',
+        email: user.email || '',
+        no_telp: user.no_telp || '',
+        gender: user.gender || 'L',
+        date_of_birth: user.date_of_birth || '',
+        alamat: user.alamat || '',
+        lokasi: user.lokasi || ''
+      })
+    }
+  }, [user])
+
   const hasChanges = 
-    profileData.name !== user?.name ||
-    profileData.email !== user?.email ||
+    profileData.name !== (user?.name || '') ||
+    profileData.email !== (user?.email || '') ||
     profileData.no_telp !== (user?.no_telp || '') ||
     profileData.gender !== (user?.gender || 'L') ||
     profileData.date_of_birth !== (user?.date_of_birth || '')
@@ -322,20 +349,26 @@ const Settings = () => {
                       {user?.email && !user?.email_verified_at && (
                         <button
                           type="button"
+                          disabled={loading || countdown > 0}
                           onClick={async () => {
                             try {
                               setLoading(true)
                               await api.post('/email/verification-notification')
                               toast.success('Link verifikasi telah dikirim ke email Anda!')
+                              setCountdown(60) // Start 60s countdown
                             } catch (error) {
                               toast.error('Gagal mengirim link verifikasi')
                             } finally {
                               setLoading(false)
                             }
                           }}
-                          className="px-4 py-2 bg-amber-50 text-amber-600 border border-amber-200 rounded-xl text-xs font-bold hover:bg-amber-100 transition-all whitespace-nowrap"
+                          className={`px-4 py-2 border rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+                            countdown > 0 
+                              ? 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed' 
+                              : 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100'
+                          }`}
                         >
-                          Kirim Link Verifikasi
+                          {countdown > 0 ? `Tunggu ${countdown}s` : 'Kirim Link Verifikasi'}
                         </button>
                       )}
                       {user?.email_verified_at && (
