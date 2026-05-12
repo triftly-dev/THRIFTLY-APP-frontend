@@ -23,23 +23,33 @@ const MapEvents = ({ onLocationSelect }) => {
   return null
 }
 
-const MapPicker = ({ defaultLat, defaultLng, onLocationChange }) => {
-  // Default to Jakarta if no coordinates are provided
-  const center = [defaultLat || -6.200000, defaultLng || 106.816666]
+const MapPicker = ({ defaultLat, defaultLng, onSelect, initialAddress }) => {
+  // Default to Semarang if no coordinates are provided (based on user location)
+  const center = [defaultLat || -6.966667, defaultLng || 110.416667]
   const [position, setPosition] = useState(defaultLat && defaultLng ? center : null)
   const [isLocating, setIsLocating] = useState(false)
+  const [selectedData, setSelectedData] = useState({
+    lat: defaultLat || center[0],
+    lng: defaultLng || center[1],
+    address: initialAddress || ''
+  })
   const mapRef = useRef(null)
 
   const handleLocationSelect = async (lat, lng) => {
     setPosition([lat, lng])
     try {
-      // Create a reverse geocoding request to Nominatim OpenStreetMap
       const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
       const data = await res.json()
-      onLocationChange({ lat, lng, address: data.display_name })
+      setSelectedData({ lat, lng, address: data.display_name })
     } catch (error) {
       console.error('Failed to reverse geocode', error)
-      onLocationChange({ lat, lng, address: '' })
+      setSelectedData({ lat, lng, address: 'Lokasi tidak diketahui' })
+    }
+  }
+
+  const handleConfirm = () => {
+    if (onSelect) {
+      onSelect(selectedData)
     }
   }
 
@@ -70,7 +80,7 @@ const MapPicker = ({ defaultLat, defaultLng, onLocationChange }) => {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col h-full space-y-3">
       <div className="flex justify-between items-center">
         <label className="block text-sm font-medium text-gray-700">Tentukan Titik Pengiriman</label>
         <Button 
@@ -84,7 +94,7 @@ const MapPicker = ({ defaultLat, defaultLng, onLocationChange }) => {
         </Button>
       </div>
       
-      <div className="h-[300px] rounded-xl overflow-hidden border border-gray-300 relative z-0">
+      <div className="flex-grow min-h-[300px] rounded-xl overflow-hidden border border-gray-300 relative z-0">
         <MapContainer 
           center={center} 
           zoom={13} 
@@ -99,10 +109,20 @@ const MapPicker = ({ defaultLat, defaultLng, onLocationChange }) => {
           {position && <Marker position={position} />}
         </MapContainer>
       </div>
-      <p className="text-xs text-gray-500 flex items-center">
-        <MapPin size={12} className="mr-1" /> 
-        Bisa geser peta atau klik di mana saja untuk memindahkan pin.
-      </p>
+
+      <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
+        <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Alamat Terpilih:</p>
+        <p className="text-xs text-gray-700 line-clamp-2 mb-3">
+          {selectedData.address || 'Klik pada peta untuk memilih lokasi...'}
+        </p>
+        <Button 
+          fullWidth 
+          onClick={handleConfirm}
+          disabled={!selectedData.address}
+        >
+          Konfirmasi & Gunakan Lokasi Ini
+        </Button>
+      </div>
     </div>
   )
 }
