@@ -116,9 +116,20 @@ const Checkout = () => {
   }
 
   const handleMapSelect = (selectedData) => {
+    // Cari kecocokan kota/kabupaten di ALL_LOCATIONS
+    let matchedLocation = ''
+    if (selectedData.city) {
+      const searchName = selectedData.city.toLowerCase()
+      const found = ALL_LOCATIONS.find(loc => 
+        searchName.includes(loc.nama.toLowerCase().replace('kota ', '').replace('kab. ', ''))
+      )
+      if (found) matchedLocation = found.id
+    }
+
     setAddressForm({
       ...addressForm,
-      alamat: selectedData.address
+      alamat: selectedData.address,
+      lokasi: matchedLocation || addressForm.lokasi // Update jika ketemu, jika tidak tetap yang lama
     })
     setShowMapModal(false)
   }

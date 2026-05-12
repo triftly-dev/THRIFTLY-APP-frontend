@@ -40,10 +40,20 @@ const MapPicker = ({ defaultLat, defaultLng, onSelect, initialAddress }) => {
     try {
       const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
       const data = await res.json()
-      setSelectedData({ lat, lng, address: data.display_name })
+      
+      // Deteksi kota/kabupaten untuk sinkronisasi otomatis
+      const address = data.address || {}
+      const cityOrRegency = address.city || address.town || address.city_district || address.county || ''
+      
+      setSelectedData({ 
+        lat, 
+        lng, 
+        address: data.display_name,
+        city: cityOrRegency 
+      })
     } catch (error) {
       console.error('Failed to reverse geocode', error)
-      setSelectedData({ lat, lng, address: 'Lokasi tidak diketahui' })
+      setSelectedData({ lat, lng, address: 'Lokasi tidak diketahui', city: '' })
     }
   }
 
