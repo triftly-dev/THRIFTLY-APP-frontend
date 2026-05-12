@@ -146,9 +146,13 @@ const ProductDetail = () => {
     try {
       setVerifying(true)
       
-      // Jika nomor baru diinput, update dulu ke profil (opsional, tapi bagus agar sinkron)
+      // Jika nomor baru diinput, update dulu ke profil
       if (newPhone && newPhone !== user.no_telp) {
-        await api.put('/user/profile', { no_telp: newPhone })
+        await api.put('/user/profile', { 
+          name: user.name, 
+          email: user.email, 
+          no_telp: newPhone 
+        })
         await refreshUser()
       }
 
