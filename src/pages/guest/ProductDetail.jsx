@@ -535,18 +535,20 @@ const ProductDetail = () => {
                     placeholder="000000"
                   />
 
-                  <div className="text-center">
+                  <div className="py-2 text-center border-t border-gray-50 mt-4">
                     {countdownPhone > 0 ? (
-                      <p className="text-sm text-gray-500">
-                        Kirim ulang dalam <span className="font-bold text-primary-600">{countdownPhone}s</span>
-                      </p>
+                      <div className="flex items-center justify-center gap-2 text-sm text-gray-500 bg-gray-50 py-2 rounded-xl">
+                        <span className="w-2 h-2 bg-primary-500 rounded-full animate-pulse"></span>
+                        Kirim ulang tersedia dalam <span className="font-mono font-bold text-primary-600">{countdownPhone}s</span>
+                      </div>
                     ) : (
                       <button 
+                        type="button"
                         onClick={handleSendOTP}
                         disabled={verifying}
-                        className="text-sm font-bold text-primary-600 hover:underline"
+                        className="w-full py-2 text-sm font-bold text-primary-600 hover:bg-primary-50 rounded-xl transition-all"
                       >
-                        Kirim Ulang OTP
+                        Belum terima kode? Kirim Ulang
                       </button>
                     )}
                   </div>
