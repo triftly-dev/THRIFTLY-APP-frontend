@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Edit, Trash2 } from 'lucide-react'
+import { Edit, Trash2, ShoppingBag } from 'lucide-react'
 import Header from '../../components/layout/Header'
 import Footer from '../../components/layout/Footer'
 import Container from '../../components/layout/Container'
@@ -54,7 +54,8 @@ const MyProducts = () => {
       rejected: 'danger'
     }
     const variant = variants[status] || 'info'
-    return <Badge variant={variant}>{STATUS[status] || status}</Badge>
+    const statusText = status ? (STATUS[status] || status) : 'Unknown'
+    return <Badge variant={variant}>{statusText}</Badge>
   }
 
   const filteredProducts = products.filter(product => {
@@ -117,10 +118,10 @@ const MyProducts = () => {
                 <div key={product.id} className="bg-white rounded-2xl p-4 md:p-6 shadow-soft border border-gray-100 hover:shadow-md transition-all group">
                   <div className="flex flex-col md:flex-row gap-6">
                     <div className="relative w-full md:w-40 h-40 shrink-0 bg-gray-100 rounded-xl overflow-hidden">
-                      {product.fotos && product.fotos.length > 0 ? (
+                      {product?.fotos && product.fotos.length > 0 ? (
                         <img
                           src={product.fotos[0]}
-                          alt={product.nama}
+                          alt={product.nama || 'Produk'}
                           className="w-full h-full object-cover"
                         />
                       ) : (
@@ -156,7 +157,7 @@ const MyProducts = () => {
                           </div>
                         </div>
                         <p className="text-2xl font-black text-primary-700">
-                          {formatCurrency(product.harga || 0)}
+                          {formatCurrency(product.harga || product.price || 0)}
                         </p>
                       </div>
                       
@@ -170,7 +171,7 @@ const MyProducts = () => {
                           </div>
                         ) : (
                           <div className="px-3 py-1 bg-primary-50 text-primary-700 rounded-lg text-xs font-bold border border-primary-100">
-                            STOK: {product.stok || product.stock}
+                            STOK: {product.stok ?? product.stock ?? 0}
                           </div>
                         )}
                         
