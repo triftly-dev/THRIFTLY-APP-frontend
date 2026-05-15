@@ -100,9 +100,8 @@ const Header = () => {
               <>
                 {isSeller && (
                   <>
-                    {/* Link Khusus Toko / Penjual */}
                     <Link to="/toko/dashboard" className="text-gray-600 hover:text-primary-600 font-medium transition-colors">
-                      Toko Saya
+                      Dashboard Penjualan
                     </Link>
                     <Link to="/toko/produk/tambah">
                       <Button size="sm">{BUTTONS.sell}</Button>
@@ -112,9 +111,8 @@ const Header = () => {
 
                 {isBuyer && (
                   <>
-                    {/* Link Khusus Pembeli */}
                     <Link to="/user/dashboard" className="text-gray-600 hover:text-primary-600 font-medium transition-colors ml-4">
-                      Dashboard Penjualan
+                      Pesanan Saya
                     </Link>
                   </>
                 )}
