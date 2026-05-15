@@ -2,9 +2,30 @@ import Header from '../../components/layout/Header'
 import Footer from '../../components/layout/Footer'
 import Container from '../../components/layout/Container'
 import { Mail, MessageCircle, Phone, MapPin, Send } from 'lucide-react'
+import { useState } from 'react'
 import Button from '../../components/common/Button'
 
 const Contact = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  })
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const { name, email, subject, message } = formData
+    const mailtoUrl = `mailto:triftlydev@gmail.com?subject=${encodeURIComponent(subject || 'Kontak dari Thriftly')}&body=${encodeURIComponent(
+      `Nama: ${name}\nEmail: ${email}\n\nPesan:\n${message}`
+    )}`
+    window.location.href = mailtoUrl
+  }
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
@@ -53,25 +74,57 @@ const Contact = () => {
 
             {/* Contact Form */}
             <div className="lg:col-span-2">
-              <form className="bg-white p-8 rounded-3xl shadow-soft border border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <form onSubmit={handleSubmit} className="bg-white p-8 rounded-3xl shadow-soft border border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
-                  <input type="text" className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-primary-500" placeholder="Masukkan nama Anda..." />
+                  <input 
+                    type="text" 
+                    name="name"
+                    required
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-primary-500" 
+                    placeholder="Masukkan nama Anda..." 
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Alamat Email</label>
-                  <input type="email" className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-primary-500" placeholder="email@contoh.com" />
+                  <input 
+                    type="email" 
+                    name="email"
+                    required
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-primary-500" 
+                    placeholder="email@contoh.com" 
+                  />
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Subjek Pesan</label>
-                  <input type="text" className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-primary-500" placeholder="Ada yang bisa kami bantu?" />
+                  <input 
+                    type="text" 
+                    name="subject"
+                    required
+                    value={formData.subject}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-primary-500" 
+                    placeholder="Ada yang bisa kami bantu?" 
+                  />
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Pesan</label>
-                  <textarea rows="4" className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-primary-500" placeholder="Tuliskan pesan Anda di sini..."></textarea>
+                  <textarea 
+                    rows="4" 
+                    name="message"
+                    required
+                    value={formData.message}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-primary-500" 
+                    placeholder="Tuliskan pesan Anda di sini..."
+                  ></textarea>
                 </div>
                 <div className="md:col-span-2">
-                  <Button fullWidth size="lg">
+                  <Button type="submit" fullWidth size="lg">
                     <Send size={18} className="mr-2" />
                     Kirim Pesan Sekarang
                   </Button>
