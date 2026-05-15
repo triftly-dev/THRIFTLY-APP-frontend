@@ -4,6 +4,8 @@ import Container from '../../components/layout/Container'
 import { Mail, MessageCircle, Phone, MapPin, Send } from 'lucide-react'
 import { useState } from 'react'
 import Button from '../../components/common/Button'
+import api from '../../services/api'
+import toast from 'react-hot-toast'
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -12,14 +14,27 @@ const Contact = () => {
     subject: '',
     message: ''
   })
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    const { name, email, subject, message } = formData
-    const mailtoUrl = `mailto:triftlydev@gmail.com?subject=${encodeURIComponent(subject || 'Kontak dari Thriftly')}&body=${encodeURIComponent(
-      `Nama: ${name}\nEmail: ${email}\n\nPesan:\n${message}`
-    )}`
-    window.location.href = mailtoUrl
+    setIsSubmitting(true)
+
+    try {
+      const response = await api.post('/contact', formData)
+      
+      if (response.data.success) {
+        toast.success(response.data.message || 'Pesan berhasil dikirim!')
+        setFormData({ name: '', email: '', subject: '', message: '' })
+      } else {
+        toast.error('Gagal mengirim pesan. Silakan coba lagi.')
+      }
+    } catch (error) {
+      console.error('Contact Error:', error)
+      toast.error(error.response?.data?.message || 'Terjadi kesalahan saat mengirim pesan.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleChange = (e) => {
@@ -124,7 +139,7 @@ const Contact = () => {
                   ></textarea>
                 </div>
                 <div className="md:col-span-2">
-                  <Button type="submit" fullWidth size="lg">
+                  <Button type="submit" fullWidth size="lg" isLoading={isSubmitting} disabled={isSubmitting}>
                     <Send size={18} className="mr-2" />
                     Kirim Pesan Sekarang
                   </Button>
