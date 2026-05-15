@@ -58,7 +58,21 @@ const Checkout = () => {
     cargo: 0
   }
 
-  // Midtrans Snap script loading removed for Custom UI / Core API integration.
+  // Load Midtrans Snap Script
+  useEffect(() => {
+    const midtransScriptUrl = "https://app.sandbox.midtrans.com/snap/snap.js";
+    const myMidtransClientKey = import.meta.env.VITE_MIDTRANS_CLIENT_KEY;
+
+    let scriptTag = document.createElement('script');
+    scriptTag.src = midtransScriptUrl;
+    scriptTag.setAttribute('data-client-key', myMidtransClientKey);
+
+    document.body.appendChild(scriptTag);
+
+    return () => {
+      document.body.removeChild(scriptTag);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -136,35 +150,53 @@ const Checkout = () => {
 
   const handleCheckout = async () => {
     const userAddress = user?.alamat || user?.profile?.alamat;
+    // Pengecekan alamat dinonaktifkan sementara untuk testing Midtrans (sesuai request sebelumnya)
+    /*
     if (!userAddress) {
       toast.error('Silakan lengkapi alamat pengiriman di profil Anda')
       return
     }
+    */
 
     setIsSubmitting(true)
     
     try {
-      const response = await api.post('/payment/charge', {
+      // 1. Ambil Snap Token dari Backend
+      const response = await api.post('/payment/token', {
         product_id: product.id,
         price: totalPembayaran,
-        bank: paymentMethod === 'transfer_bank' ? 'bca' : paymentMethod,
         seller_id: seller?.id || product.user_id,
-        alamat_pengiriman: user.alamat || user.profile?.alamat,
+        alamat_pengiriman: user.alamat || user.profile?.alamat || '-',
         ongkir: ongkir
       });
 
-      if (response.data.success) {
-        console.log('DEBUG PAYMENT RESPONSE:', response.data);
-        toast.success('Pesanan berhasil dibuat!');
-        // Menggunakan rute yang benar sesuai src/routes/index.jsx
-        navigate(`/payment/success/${response.data.data.order_id}`);
+      if (response.data.token) {
+        // 2. Munculkan Popup Midtrans
+        window.snap.pay(response.data.token, {
+          onSuccess: function(result) {
+            toast.success('Pembayaran Berhasil!');
+            navigate(`/payment/success/${response.data.order_id}`);
+          },
+          onPending: function(result) {
+            toast.success('Menunggu pembayaran Anda');
+            navigate(`/payment/success/${response.data.order_id}`);
+          },
+          onError: function(result) {
+            toast.error('Pembayaran gagal');
+            setIsSubmitting(false);
+          },
+          onClose: function() {
+            toast.error('Anda menutup popup sebelum selesai');
+            setIsSubmitting(false);
+          }
+        });
       } else {
-        throw new Error('Gagal memproses pembayaran');
+        throw new Error('Gagal mendapatkan token pembayaran');
       }
       
     } catch (error) {
       console.error(error);
-      toast.error(error.response?.data?.error || 'Gagal terhubung ke server pembayaran');
+      toast.error(error.response?.data?.error || 'Gagal terhubung ke server Midtrans');
       setIsSubmitting(false);
     }
   }
