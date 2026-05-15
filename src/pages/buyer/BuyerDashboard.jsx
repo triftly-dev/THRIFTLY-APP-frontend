@@ -117,7 +117,7 @@ const BuyerDashboard = () => {
           <MapPicker 
             defaultLat={currentCoords.lat} 
             defaultLng={currentCoords.lng}
-            onLocationChange={(loc) => {
+            onSelect={(loc) => {
               setNewLokasi(`${loc.lat},${loc.lng}`)
               if (loc.address) setNewAlamat(loc.address)
             }}
