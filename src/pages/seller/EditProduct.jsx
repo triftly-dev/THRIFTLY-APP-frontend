@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useParams, useBlocker } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Upload, X, MapPin, ShoppingBag } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Header from '../../components/layout/Header'
@@ -38,12 +38,6 @@ const EditProduct = () => {
   })
 
   const [initialData, setInitialData] = useState(null)
-
-  // Blocker untuk navigasi internal (React Router)
-  const blocker = useBlocker(
-    ({ currentLocation, nextLocation }) =>
-      hasChanges && !isSubmitting && currentLocation.pathname !== nextLocation.pathname
-  )
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -107,10 +101,12 @@ const EditProduct = () => {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
   }, [hasChanges])
 
+  // Custom Modal State
+  const [showExitModal, setShowExitModal] = useState(false)
+
   const handleBack = () => {
     if (hasChanges) {
-      // Biarkan blocker yang bekerja
-      navigate('/toko/produk')
+      setShowExitModal(true)
     } else {
       navigate('/toko/produk')
     }
@@ -409,8 +405,8 @@ const EditProduct = () => {
         </Container>
       </main>
 
-      {/* Modal Konfirmasi Navigasi (Blocker) */}
-      {blocker.state === 'blocked' && (
+      {/* Modal Konfirmasi Navigasi (Manual) */}
+      {showExitModal && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-white rounded-3xl p-8 w-full max-w-md text-center shadow-2xl animate-in zoom-in duration-300">
             <div className="w-20 h-20 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -424,13 +420,13 @@ const EditProduct = () => {
             
             <div className="flex flex-col gap-3">
               <button
-                onClick={() => blocker.proceed()}
+                onClick={() => navigate('/toko/produk')}
                 className="w-full py-4 bg-red-500 text-white font-bold rounded-2xl hover:bg-red-600 transition-all shadow-lg shadow-red-100"
               >
                 Ya, Batalkan Perubahan
               </button>
               <button
-                onClick={() => blocker.reset()}
+                onClick={() => setShowExitModal(false)}
                 className="w-full py-4 bg-gray-100 text-gray-700 font-bold rounded-2xl hover:bg-gray-200 transition-all"
               >
                 Lanjutkan Mengedit
