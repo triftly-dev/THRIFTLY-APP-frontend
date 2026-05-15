@@ -58,11 +58,11 @@ const EditProduct = () => {
 
         setProduct(data)
         const mappedData = {
-          nama: data.nama,
-          harga: data.harga.toString(),
-          kategori: data.kategori,
-          kondisi: data.kondisi,
-          deskripsi: data.deskripsi,
+          nama: data.nama || '',
+          harga: (data.harga || data.price || 0).toString(),
+          kategori: data.kategori || '',
+          kondisi: data.kondisi || '',
+          deskripsi: data.deskripsi || '',
           isBU: data.isBU || data.is_bu || false,
           stok: data.stok || data.stock || 1
         }
@@ -94,11 +94,29 @@ const EditProduct = () => {
     const handleBeforeUnload = (e) => {
       if (hasChanges) {
         e.preventDefault()
-        e.returnValue = ''
+        e.returnValue = 'Perubahan belum disimpan. Yakin ingin keluar?'
       }
     }
+
+    // Intercept Browser Back
+    const handlePopState = (e) => {
+      if (hasChanges) {
+        // Push state lagi agar tetap di halaman ini (mencegah back sementara)
+        window.history.pushState(null, '', window.location.pathname);
+        setShowExitModal(true)
+      }
+    }
+
     window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+    window.addEventListener('popstate', handlePopState)
+    
+    // Inisialisasi state agar popstate bisa jalan
+    window.history.pushState(null, '', window.location.pathname);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+      window.removeEventListener('popstate', handlePopState)
+    }
   }, [hasChanges])
 
   // Custom Modal State
@@ -257,7 +275,7 @@ const EditProduct = () => {
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
-                    placeholder="Contoh: iPhone 13 Pro Max 256GB"
+                    placeholder="Masukkan nama produk..."
                   />
                 </div>
 
@@ -294,7 +312,7 @@ const EditProduct = () => {
                     required
                     min="0"
                     className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
-                    placeholder="Contoh: 1"
+                    placeholder="Masukkan jumlah stok..."
                   />
                 </div>
               </div>

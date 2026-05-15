@@ -170,33 +170,43 @@ const Checkout = () => {
         ongkir: ongkir
       });
 
+      console.log("SNAP TOKEN RESPONSE:", response.data);
+
       if (response.data.token) {
         // 2. Munculkan Popup Midtrans
-        window.snap.pay(response.data.token, {
-          onSuccess: function(result) {
-            toast.success('Pembayaran Berhasil!');
-            navigate(`/payment/success/${response.data.order_id}`);
-          },
-          onPending: function(result) {
-            toast.success('Menunggu pembayaran Anda');
-            navigate(`/payment/success/${response.data.order_id}`);
-          },
-          onError: function(result) {
-            toast.error('Pembayaran gagal');
-            setIsSubmitting(false);
-          },
-          onClose: function() {
-            toast.error('Anda menutup popup sebelum selesai');
-            setIsSubmitting(false);
-          }
-        });
+        if (window.snap) {
+          window.snap.pay(response.data.token, {
+            onSuccess: function(result) {
+              console.log('SUCCESS:', result);
+              toast.success('Pembayaran Berhasil!');
+              navigate(`/payment/success/${response.data.order_id}`);
+            },
+            onPending: function(result) {
+              console.log('PENDING:', result);
+              toast.success('Pesanan dibuat, silakan selesaikan pembayaran.');
+              navigate(`/payment/success/${response.data.order_id}`);
+            },
+            onError: function(result) {
+              console.error('ERROR:', result);
+              toast.error('Pembayaran gagal');
+              setIsSubmitting(false);
+            },
+            onClose: function() {
+              toast('Anda menutup pembayaran', { icon: 'ℹ️' });
+              setIsSubmitting(false);
+            }
+          });
+        } else {
+          toast.error('Script Midtrans belum siap, silakan refresh');
+          setIsSubmitting(false);
+        }
       } else {
-        throw new Error('Gagal mendapatkan token pembayaran');
+        throw new Error('Gagal mendapatkan token pembayaran dari server');
       }
       
     } catch (error) {
-      console.error(error);
-      toast.error(error.response?.data?.error || 'Gagal terhubung ke server Midtrans');
+      console.error("CHECKOUT ERROR:", error);
+      toast.error(error.response?.data?.message || 'Gagal memproses pembayaran');
       setIsSubmitting(false);
     }
   }

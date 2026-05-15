@@ -59,11 +59,13 @@ const MyProducts = () => {
   }
 
   const filteredProducts = products.filter(product => {
-    const isOutOfStock = (product.stok || product.stock || 0) <= 0
-    const isActive = product.status === 'approved' && !isOutOfStock
+    const stock = product.stok ?? product.stock ?? 0;
+    const isOutOfStock = stock <= 0;
+    const isApproved = product.status === 'approved';
+    const isActive = isApproved && !isOutOfStock;
     
-    return activeTab === 'aktif' ? isActive : !isActive
-  })
+    return activeTab === 'aktif' ? isActive : !isActive;
+  });
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 pb-16 md:pb-0">

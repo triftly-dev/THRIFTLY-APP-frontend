@@ -405,8 +405,7 @@ const ProductDetail = () => {
                         {seller.name || 'Juragan'}
                       </p>
                       <div className="flex items-center text-sm text-gray-500 mt-1">
-                        <MapPin size={14} className="mr-1" />
-                        {getLocationName((seller.profile?.lokasi && seller.profile.lokasi !== 'N/A') ? seller.profile.lokasi : product.lokasi)}
+                        Penjual Terverifikasi
                       </div>
                     </div>
                     <div className="flex items-center gap-1 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">

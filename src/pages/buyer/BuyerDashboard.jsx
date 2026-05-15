@@ -111,7 +111,7 @@ const BuyerDashboard = () => {
         isOpen={isEditModalOpen} 
         onClose={() => setIsEditModalOpen(false)} 
         title="Ubah Alamat Pengiriman" 
-        size="md"
+        size="lg"
       >
         <div className="space-y-4">
           <MapPicker 
