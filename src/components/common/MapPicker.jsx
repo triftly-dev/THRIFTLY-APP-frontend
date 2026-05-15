@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useRef } from 'react'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
-import { MapPin, Crosshair } from 'lucide-react'
+import { Crosshair } from 'lucide-react'
 import Button from './Button'
 
 // Fix for default marker icons in React Leaflet
