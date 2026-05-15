@@ -8,6 +8,7 @@ import Card from '../../components/common/Card'
 import Button from '../../components/common/Button'
 import { useAuth } from '../../context/AuthContext'
 import { productService } from '../../services/productService'
+import { transactionService } from '../../services/transactionService'
 import { formatCurrency } from '../../utils/helpers'
 import FullPageLoader from '../../components/common/FullPageLoader'
 
@@ -25,13 +26,22 @@ const SellerDashboard = () => {
     const fetchSellerStats = async () => {
       if (user) {
         try {
+          // Ambil produk untuk hitung produk aktif
           const products = await productService.getMyProducts()
           
+          // Ambil transaksi untuk hitung pesanan & penjualan
+          const orders = await transactionService.getTransactionsBySeller(user.id)
+          
+          // Hitung statistik
+          const newOrdersCount = orders.filter(o => o.status === 'paid' || o.status === 'settlement').length
+          const toShipCount = orders.filter(o => o.status === 'paid' || o.status === 'settlement').length // Sama dengan pesanan baru yang butuh dikirim
+          const totalSalesVal = orders.filter(o => o.status === 'completed').reduce((acc, curr) => acc + (parseInt(curr.harga_final) || 0), 0)
+
           setStats({
             totalProducts: products.length,
-            newOrders: 0, // Placeholder
-            toShip: 0,    // Placeholder
-            totalSales: user?.total_penjualan || 0
+            newOrders: newOrdersCount,
+            toShip: toShipCount,
+            totalSales: totalSalesVal || user?.total_penjualan || 0
           })
         } catch (error) {
           console.error('Gagal mengambil statistik penjual:', error)

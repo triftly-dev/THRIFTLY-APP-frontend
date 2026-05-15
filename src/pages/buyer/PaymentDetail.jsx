@@ -47,11 +47,14 @@ const PaymentDetail = () => {
   useEffect(() => {
     const fetchTransaction = async () => {
       try {
-        // Asumsi ada method getTransactionByOrderId
-        // Jika belum ada, kita bisa filter dari list transactions
         const data = await transactionService.getTransactionByOrderId(orderId)
         console.log('DEBUG TRANSACTION:', data)
         setTransaction(data)
+        
+        // AUTO-DETECT SUCCESS: Jika status sudah settlement/paid, tampilkan halaman sukses
+        if (data.status === 'settlement' || data.status === 'paid' || data.status === 'completed') {
+          setIsSuccess(true)
+        }
       } catch (error) {
         console.error("Gagal mengambil data pembayaran:", error)
       } finally {
@@ -114,7 +117,7 @@ const PaymentDetail = () => {
             <div className="bg-gray-50 rounded-2xl p-6 mb-8 flex flex-col gap-3">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Metode Pembayaran</span>
-                <span className="font-bold text-gray-900 uppercase">Virtual Account {transaction.bank}</span>
+                <span className="font-bold text-gray-900 uppercase">{transaction.payment_type || 'Pembayaran Digital'}</span>
               </div>
               <div className="flex justify-between text-sm pt-3 border-t border-gray-200">
                 <span className="text-gray-500">Total Pembayaran</span>
