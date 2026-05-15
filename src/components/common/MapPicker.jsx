@@ -14,7 +14,7 @@ L.Icon.Default.mergeOptions({
 });
 
 // Component to handle map clicks and resizing
-const MapController = ({ onLocationSelect, getCurrentLocation }) => {
+const MapController = ({ onLocationSelect, getCurrentLocation, setMapInstance }) => {
   const map = useMapEvents({
     click(e) {
       onLocationSelect(e.latlng.lat, e.latlng.lng)
@@ -23,6 +23,7 @@ const MapController = ({ onLocationSelect, getCurrentLocation }) => {
 
   // Fix for blank map & auto-locate
   useEffect(() => {
+    if (setMapInstance) setMapInstance(map)
     if (getCurrentLocation) getCurrentLocation(map)
     
     setTimeout(() => {
@@ -38,6 +39,7 @@ const MapPicker = ({ defaultLat, defaultLng, onSelect, initialAddress }) => {
   const center = [defaultLat || -6.966667, defaultLng || 110.416667]
   const [position, setPosition] = useState(defaultLat && defaultLng ? center : null)
   const [isLocating, setIsLocating] = useState(false)
+  const [mapInstance, setMapInstance] = useState(null)
   const [selectedData, setSelectedData] = useState({
     lat: defaultLat || center[0],
     lng: defaultLng || center[1],
@@ -71,9 +73,11 @@ const MapPicker = ({ defaultLat, defaultLng, onSelect, initialAddress }) => {
     }
   }
 
-  const getCurrentLocation = (mapInstance) => {
-    // Jika sudah ada koordinat default (edit), jangan auto-locate agar tidak loncat
-    if (defaultLat && defaultLng) return
+  const getCurrentLocation = (instance) => {
+    const activeMap = instance || mapInstance
+    
+    // Jika auto-locate (instance ada) dan sudah ada koordinat default (edit), jangan loncat
+    if (instance && defaultLat && defaultLng) return
 
     setIsLocating(true)
     if ('geolocation' in navigator) {
@@ -81,9 +85,11 @@ const MapPicker = ({ defaultLat, defaultLng, onSelect, initialAddress }) => {
         (pos) => {
           const { latitude, longitude } = pos.coords
           setPosition([latitude, longitude])
-          if (mapInstance) {
-            mapInstance.flyTo([latitude, longitude], 16)
+          
+          if (activeMap) {
+            activeMap.flyTo([latitude, longitude], 18) // Zoom In Level 18 (Lebih Dekat)
           }
+          
           handleLocationSelect(latitude, longitude)
           setIsLocating(false)
         },
@@ -105,12 +111,7 @@ const MapPicker = ({ defaultLat, defaultLng, onSelect, initialAddress }) => {
         <Button 
           variant="outline" 
           size="sm" 
-          onClick={() => {
-            // Kita butuh akses ke map, tapi tombol ini di luar MapContainer.
-            // Biar gampang, kita biarkan Leaflet auto-locate sendiri atau pakai state.
-            // Tapi untuk tombol manual, kita biarkan saja.
-            getCurrentLocation()
-          }} 
+          onClick={() => getCurrentLocation()} 
           loading={isLocating}
           className="text-xs"
         >
@@ -128,7 +129,11 @@ const MapPicker = ({ defaultLat, defaultLng, onSelect, initialAddress }) => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <MapController onLocationSelect={handleLocationSelect} getCurrentLocation={getCurrentLocation} />
+          <MapController 
+            onLocationSelect={handleLocationSelect} 
+            getCurrentLocation={getCurrentLocation} 
+            setMapInstance={setMapInstance}
+          />
           {position && <Marker position={position} />}
         </MapContainer>
 
