@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
@@ -34,6 +34,15 @@ const MapPicker = ({ defaultLat, defaultLng, onSelect, initialAddress }) => {
     address: initialAddress || ''
   })
   const mapRef = useRef(null)
+
+  // Fix for blank map in Modals: invalidateSize when map is loaded
+  useEffect(() => {
+    if (mapRef.current) {
+      setTimeout(() => {
+        mapRef.current.invalidateSize()
+      }, 500)
+    }
+  }, [])
 
   const handleLocationSelect = async (lat, lng) => {
     setPosition([lat, lng])
