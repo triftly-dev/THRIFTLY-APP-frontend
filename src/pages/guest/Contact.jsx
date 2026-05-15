@@ -1,7 +1,7 @@
 import Header from '../../components/layout/Header'
 import Footer from '../../components/layout/Footer'
 import Container from '../../components/layout/Container'
-import { Mail, MessageCircle, Phone, MapPin, Send } from 'lucide-react'
+import { Mail, Phone, MapPin, Send } from 'lucide-react'
 import { useState } from 'react'
 import Button from '../../components/common/Button'
 import api from '../../services/api'
