@@ -109,7 +109,8 @@ const ProductDetail = () => {
       return
     }
 
-    // CEK VERIFIKASI
+    // CEK VERIFIKASI (Dinonaktifkan sementara untuk testing Midtrans)
+    /*
     const needsEmailVerif = !user.google_id && !user.email_verified_at
     const needsPhoneVerif = !user.phone_verified_at
 
@@ -118,6 +119,7 @@ const ProductDetail = () => {
       setIsVerifModalOpen(true)
       return
     }
+    */
 
     navigate(`/checkout/${product.id}`)
   }
@@ -384,11 +386,24 @@ const ProductDetail = () => {
                 <div className="bg-white rounded-2xl p-6 shadow-soft border border-gray-100">
                   <h3 className="font-semibold text-gray-900 mb-4">Info Penjual</h3>
                   <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-gradient-to-br from-primary-100 to-primary-200 rounded-full flex items-center justify-center text-primary-700 font-bold text-xl border-2 border-white shadow-sm">
-                      {seller.profile?.nama?.charAt(0).toUpperCase() || 'S'}
+                    <div className="w-14 h-14 bg-gradient-to-br from-primary-100 to-primary-200 rounded-full overflow-hidden flex items-center justify-center text-primary-700 font-bold text-xl border-2 border-white shadow-sm shrink-0">
+                      {(seller.avatar || seller.photo_profile) ? (
+                        <img 
+                          src={(seller.avatar || seller.photo_profile).startsWith('http') 
+                            ? (seller.avatar || seller.photo_profile)
+                            : `${import.meta.env.VITE_API_URL}/storage/${(seller.avatar || seller.photo_profile).startsWith('avatars/') ? (seller.avatar || seller.photo_profile) : `avatars/${(seller.avatar || seller.photo_profile)}`}`
+                          } 
+                          alt={seller.name} 
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        seller.name?.charAt(0).toUpperCase() || 'S'
+                      )}
                     </div>
-                    <div className="flex-1">
-                      <p className="font-bold text-gray-900 text-lg">{seller?.name || seller?.profile?.nama || 'Juragan'}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-gray-900 text-lg truncate">
+                        {seller.name || 'Juragan'}
+                      </p>
                       <div className="flex items-center text-sm text-gray-500 mt-1">
                         <MapPin size={14} className="mr-1" />
                         {getLocationName((seller.profile?.lokasi && seller.profile.lokasi !== 'N/A') ? seller.profile.lokasi : product.lokasi)}

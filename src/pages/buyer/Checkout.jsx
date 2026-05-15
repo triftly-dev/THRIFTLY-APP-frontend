@@ -459,16 +459,10 @@ const Checkout = () => {
                   size="lg" 
                   onClick={handleCheckout}
                   isLoading={isSubmitting}
-                  disabled={isSubmitting || !(user?.alamat || user.profile?.alamat)}
+                  disabled={isSubmitting}
                 >
                   Bayar Sekarang
                 </Button>
-                
-                {!(user?.alamat || user.profile?.alamat) && (
-                  <p className="text-xs text-red-500 text-center mt-3">
-                    Silakan isi alamat pengiriman di profil terlebih dahulu.
-                  </p>
-                )}
               </div>
             </div>
           </div>

@@ -51,8 +51,7 @@ export const registerSellerSchema = z.object({
     .min(1, 'Lokasi wajib dipilih'),
   noRekening: z.string()
     .min(8, 'Nomor rekening minimal 8 digit ya'),
-  ktpUrl: z.string()
-    .min(1, 'Foto KTP wajib diupload')
+  ktpUrl: z.string().optional()
 }).refine((data) => data.password === data.confirmPassword, {
   message: 'Password gak sama nih',
   path: ['confirmPassword']
