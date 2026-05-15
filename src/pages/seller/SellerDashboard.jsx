@@ -117,19 +117,25 @@ const SellerDashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           {/* Wallet Section */}
           <div className="lg:col-span-1">
-            <div className="bg-primary-900 rounded-3xl p-8 text-white relative overflow-hidden shadow-2xl">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-primary-400 blur-[100px] opacity-20"></div>
-              <h2 className="text-lg font-medium opacity-70 mb-1">Saldo Penjual</h2>
-              <h3 className="text-4xl font-bold mb-8">{formatCurrency(user?.saldo?.bisaDitarik || 0)}</h3>
+            <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col h-full">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center text-primary-600">
+                  <DollarSign size={24} />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Saldo Penjual</p>
+                  <h3 className="text-xl font-bold text-gray-900">{formatCurrency(user?.saldo?.bisaDitarik || 0)}</h3>
+                </div>
+              </div>
               
-              <div className="space-y-4 mb-8">
-                <div className="flex justify-between items-center py-3 border-b border-white/10">
-                  <span className="text-sm opacity-60">Saldo Tertahan</span>
-                  <span className="font-semibold">{formatCurrency(user?.saldo?.ketahan || 0)}</span>
+              <div className="space-y-4 mb-6 mt-auto">
+                <div className="flex justify-between items-center py-3 border-t border-gray-50">
+                  <span className="text-sm text-gray-500 font-medium">Saldo Tertahan</span>
+                  <span className="font-bold text-gray-700">{formatCurrency(user?.saldo?.ketahan || 0)}</span>
                 </div>
               </div>
 
-              <Button fullWidth className="bg-white text-primary-600 hover:bg-gray-50 border-none rounded-2xl py-4 font-bold text-lg">
+              <Button fullWidth className="shadow-sm">
                 Tarik Saldo
               </Button>
             </div>
