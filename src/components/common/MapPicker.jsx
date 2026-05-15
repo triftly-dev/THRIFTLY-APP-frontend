@@ -13,18 +13,26 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-// Component to handle map clicks
-const MapEvents = ({ onLocationSelect }) => {
-  useMapEvents({
+// Component to handle map clicks and resizing
+const MapController = ({ onLocationSelect }) => {
+  const map = useMapEvents({
     click(e) {
       onLocationSelect(e.latlng.lat, e.latlng.lng)
     },
   })
+
+  // Fix for blank map: invalidateSize on mount
+  useEffect(() => {
+    setTimeout(() => {
+      map.invalidateSize()
+    }, 300)
+  }, [map])
+
   return null
 }
 
 const MapPicker = ({ defaultLat, defaultLng, onSelect, initialAddress }) => {
-  // Default to Semarang if no coordinates are provided (based on user location)
+  // Default to Semarang if no coordinates are provided
   const center = [defaultLat || -6.966667, defaultLng || 110.416667]
   const [position, setPosition] = useState(defaultLat && defaultLng ? center : null)
   const [isLocating, setIsLocating] = useState(false)
@@ -35,22 +43,12 @@ const MapPicker = ({ defaultLat, defaultLng, onSelect, initialAddress }) => {
   })
   const mapRef = useRef(null)
 
-  // Fix for blank map in Modals: invalidateSize when map is loaded
-  useEffect(() => {
-    if (mapRef.current) {
-      setTimeout(() => {
-        mapRef.current.invalidateSize()
-      }, 500)
-    }
-  }, [])
-
   const handleLocationSelect = async (lat, lng) => {
     setPosition([lat, lng])
     try {
       const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
       const data = await res.json()
       
-      // Deteksi kota/kabupaten untuk sinkronisasi otomatis
       const address = data.address || {}
       const cityOrRegency = address.city || address.town || address.city_district || address.county || ''
       
@@ -79,9 +77,6 @@ const MapPicker = ({ defaultLat, defaultLng, onSelect, initialAddress }) => {
         (pos) => {
           const { latitude, longitude } = pos.coords
           setPosition([latitude, longitude])
-          if (mapRef.current) {
-            mapRef.current.flyTo([latitude, longitude], 16)
-          }
           handleLocationSelect(latitude, longitude)
           setIsLocating(false)
         },
@@ -118,13 +113,12 @@ const MapPicker = ({ defaultLat, defaultLng, onSelect, initialAddress }) => {
           center={center} 
           zoom={13} 
           style={{ height: '100%', width: '100%' }}
-          ref={mapRef}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <MapEvents onLocationSelect={handleLocationSelect} />
+          <MapController onLocationSelect={handleLocationSelect} />
           {position && <Marker position={position} />}
         </MapContainer>
 
