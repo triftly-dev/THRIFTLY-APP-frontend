@@ -70,7 +70,7 @@ export const SUCCESS = {
   approved: 'Produk berhasil di-approve! Sekarang udah tayang.',
   rejected: 'Produk berhasil ditolak. Seller udah dikasih tau.',
   messageSent: 'Pesan terkirim!',
-  registered: 'Akun berhasil dibuat! Selamat datang di Secondnesia!',
+  registered: 'Akun berhasil dibuat! Selamat datang di Thriftly!',
   login: 'Login berhasil! Selamat datang kembali!',
   logout: 'Logout berhasil. Sampai jumpa lagi!'
 }

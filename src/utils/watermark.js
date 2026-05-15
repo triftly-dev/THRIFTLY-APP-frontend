@@ -15,7 +15,7 @@ export const addWatermarkToImage = (imageFile) => {
         
         ctx.drawImage(img, 0, 0)
         
-        const watermarkText = 'Hanya untuk verifikasi Secondnesia'
+        const watermarkText = 'Hanya untuk verifikasi Thriftly'
         const timestamp = new Date().toLocaleDateString('id-ID')
         
         ctx.save()
