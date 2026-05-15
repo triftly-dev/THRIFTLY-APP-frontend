@@ -25,15 +25,24 @@ const ProductCard = ({ product }) => {
       <div className="absolute top-3 right-3 z-10 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-sm text-lg" title={category?.nama}>
         {category?.icon}
       </div>
-      <div className="relative aspect-[4/3] overflow-hidden bg-gray-50 p-4 flex items-center justify-center">
+      <div className={`relative aspect-[4/3] overflow-hidden bg-gray-50 p-4 flex items-center justify-center ${product.stok === 0 ? 'filter grayscale' : ''}`}>
         <img
           src={product.fotos[0]}
           alt={product.nama}
-          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-md"
+          className={`w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-md ${product.stok === 0 ? 'blur-[2px] opacity-50' : ''}`}
           loading="lazy"
         />
         
-        <div className="absolute top-3 left-3 flex flex-col gap-2">
+        {/* Overlay Stok Habis */}
+        {product.stok === 0 && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/10">
+            <div className="bg-red-600 text-white text-[10px] md:text-xs font-bold px-3 py-1.5 rounded-full shadow-lg transform -rotate-12 border-2 border-white">
+              STOK HABIS
+            </div>
+          </div>
+        )}
+        
+        <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
           {product.isBU && (
             <Badge variant="bu" size="sm">{LABELS.bu}</Badge>
           )}
