@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useBlocker } from 'react-router-dom'
 import { ArrowLeft, Upload, X, MapPin, ShoppingBag } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Header from '../../components/layout/Header'
@@ -22,7 +22,6 @@ const EditProduct = () => {
   const [loading, setLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
-  const [showExitModal, setShowExitModal] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   
   const { images, setImages, handleImageUpload, removeImage, isUploading } = useImageUpload({ maxFiles: 5 })
@@ -39,6 +38,12 @@ const EditProduct = () => {
   })
 
   const [initialData, setInitialData] = useState(null)
+
+  // Blocker untuk navigasi internal (React Router)
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      hasChanges && currentLocation.pathname !== nextLocation.pathname
+  )
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -90,7 +95,7 @@ const EditProduct = () => {
     setHasChanges(isFormChanged || isImagesChanged)
   }, [formData, images, initialData])
 
-  // Peringatan Browser Back / Close
+  // Peringatan Browser Close / Reload (Native)
   useEffect(() => {
     const handleBeforeUnload = (e) => {
       if (hasChanges) {
@@ -98,37 +103,14 @@ const EditProduct = () => {
         e.returnValue = ''
       }
     }
-
-    const handlePopState = (e) => {
-      if (hasChanges) {
-        if (window.confirm('Ada perubahan yang belum disimpan. Yakin ingin membatalkan?')) {
-          // Allow navigation
-        } else {
-          // Stay on page
-          window.history.pushState(null, '', window.location.pathname)
-        }
-      }
-    }
-
     window.addEventListener('beforeunload', handleBeforeUnload)
-    
-    // Trick to intercept back button
-    if (hasChanges) {
-      window.history.pushState(null, '', window.location.pathname)
-      window.addEventListener('popstate', handlePopState)
-    }
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-      window.removeEventListener('popstate', handlePopState)
-    }
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
   }, [hasChanges])
 
   const handleBack = () => {
     if (hasChanges) {
-      if (window.confirm('Ada perubahan yang belum disimpan. Yakin ingin membatalkan?')) {
-        navigate('/toko/produk')
-      }
+      // Biarkan blocker yang bekerja
+      navigate('/toko/produk')
     } else {
       navigate('/toko/produk')
     }
@@ -421,7 +403,38 @@ const EditProduct = () => {
         </Container>
       </main>
 
-      {/* Progress Bar Modal */}
+      {/* Modal Konfirmasi Navigasi (Blocker) */}
+      {blocker.state === 'blocked' && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl p-8 w-full max-w-md text-center shadow-2xl animate-in zoom-in duration-300">
+            <div className="w-20 h-20 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-6">
+              <ShoppingBag size={40} className="animate-bounce" />
+            </div>
+            
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">Batal Simpan?</h3>
+            <p className="text-gray-500 mb-8 leading-relaxed px-4">
+              Ada perubahan pada produk yang belum disimpan. Jika Anda keluar sekarang, perubahan tersebut akan <span className="text-red-500 font-bold">hilang permanen</span>.
+            </p>
+            
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => blocker.proceed()}
+                className="w-full py-4 bg-red-500 text-white font-bold rounded-2xl hover:bg-red-600 transition-all shadow-lg shadow-red-100"
+              >
+                Ya, Batalkan Perubahan
+              </button>
+              <button
+                onClick={() => blocker.reset()}
+                className="w-full py-4 bg-gray-100 text-gray-700 font-bold rounded-2xl hover:bg-gray-200 transition-all"
+              >
+                Lanjutkan Mengedit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Progress Bar Modal (Submitting) */}
       {isSubmitting && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-white rounded-3xl p-8 w-full max-w-sm text-center shadow-2xl animate-in zoom-in duration-300">
@@ -431,7 +444,6 @@ const EditProduct = () => {
             <h3 className="text-xl font-bold text-gray-900 mb-2">Menyimpan Produk</h3>
             <p className="text-sm text-gray-500 mb-6">Mohon tunggu sebentar, data sedang diperbarui...</p>
             
-            {/* Progress Bar Container */}
             <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden mb-2">
               <div 
                 className="h-full bg-primary-600 transition-all duration-300 ease-out rounded-full"
@@ -448,4 +460,4 @@ const EditProduct = () => {
   )
 }
 
-export default EditProduct
+export default EditProduct
