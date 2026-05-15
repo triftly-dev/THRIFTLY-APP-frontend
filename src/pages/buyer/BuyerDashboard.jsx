@@ -7,7 +7,6 @@ import Container from '../../components/layout/Container'
 import Button from '../../components/common/Button'
 import Modal from '../../components/common/Modal'
 import MapPicker from '../../components/common/MapPicker'
-import UserSidebar from '../../components/layout/UserSidebar'
 import { useAuth } from '../../context/AuthContext'
 
 const BuyerDashboard = () => {
@@ -42,11 +41,8 @@ const BuyerDashboard = () => {
       <Header />
       
       <main className="flex-grow py-8">
-        <Container>
-          <div className="flex flex-col md:flex-row gap-8">
-            {/* Sidebar dengan Gradiasi */}
-            <UserSidebar />
-
+        <Container maxWidth="max-w-4xl">
+          <div className="flex flex-col gap-8">
             <div className="flex-1">
               <div className="bg-white rounded-2xl p-8 shadow-soft border border-gray-100 mb-8">
                 <div className="flex items-center gap-4 mb-6">
