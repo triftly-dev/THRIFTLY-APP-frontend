@@ -31,11 +31,7 @@ const Login = () => {
     setLoading(false)
 
     if (result.success) {
-      if (result.user.role === 'seller') {
-        navigate('/toko/dashboard')
-      } else if (result.user.role === 'buyer') {
-        navigate('/user/dashboard')
-      } else if (result.user.role === 'admin') {
+      if (result.user.role === 'admin') {
         navigate('/admin/dashboard')
       } else {
         navigate('/')
