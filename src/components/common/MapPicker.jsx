@@ -118,20 +118,25 @@ const MapPicker = ({ defaultLat, defaultLng, onSelect, initialAddress }) => {
           <MapEvents onLocationSelect={handleLocationSelect} />
           {position && <Marker position={position} />}
         </MapContainer>
+
+        {/* Floating Confirm Button inside Map */}
+        <div className="absolute bottom-4 right-4 z-[1000]">
+          <Button 
+            onClick={handleConfirm}
+            disabled={!selectedData.address}
+            className="shadow-xl border-2 border-white"
+            size="sm"
+          >
+            Konfirmasi Lokasi Ini
+          </Button>
+        </div>
       </div>
 
       <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
         <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Alamat Terpilih:</p>
-        <p className="text-xs text-gray-700 line-clamp-2 mb-3">
+        <p className="text-xs text-gray-700 line-clamp-2">
           {selectedData.address || 'Klik pada peta untuk memilih lokasi...'}
         </p>
-        <Button 
-          fullWidth 
-          onClick={handleConfirm}
-          disabled={!selectedData.address}
-        >
-          Konfirmasi & Gunakan Lokasi Ini
-        </Button>
       </div>
     </div>
   )
