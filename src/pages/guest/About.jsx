@@ -22,7 +22,7 @@ const About = () => {
             <div className="max-w-3xl">
               <h1 className="text-4xl md:text-5xl font-bold mb-6">Misi Kami: Memberikan Nyawa Baru untuk Barang Bekas</h1>
               <p className="text-xl text-primary-100 leading-relaxed">
-                Thriftly adalah marketplace barang bekas (thrift) terpercaya di Jawa Tengah & DIY yang menghubungkan pembeli dan penjual dalam ekosistem yang aman, mudah, dan berkelanjutan.
+                Thriftly adalah marketplace barang bekas (thrift) terpercaya di Indonesia yang menghubungkan pembeli dan penjual dalam ekosistem yang aman, mudah, dan berkelanjutan.
               </p>
             </div>
           </Container>
@@ -69,7 +69,7 @@ const About = () => {
               <div className="bg-white p-8 rounded-2xl shadow-soft border border-gray-100">
                 <h3 className="text-xl font-bold mb-4">Keamanan Terjamin</h3>
                 <p className="text-gray-600 italic">"Payment Rekening Bersama"</p>
-                <p className="mt-2 text-gray-600">Dana hanya akan diteruskan ke penjual setelah pembeli menerima barang dengan sesuai. Didukung oleh Midtrans.</p>
+                <p className="mt-2 text-gray-600">Dana hanya akan diteruskan ke penjual setelah pembeli menerima barang dengan sesuai.</p>
               </div>
               <div className="bg-white p-8 rounded-2xl shadow-soft border border-gray-100">
                 <h3 className="text-xl font-bold mb-4">Komunitas Terpercaya</h3>
@@ -77,7 +77,7 @@ const About = () => {
               </div>
               <div className="bg-white p-8 rounded-2xl shadow-soft border border-gray-100">
                 <h3 className="text-xl font-bold mb-4">Dukungan Lokal</h3>
-                <p className="text-gray-600">Fokus utama kami adalah memberdayakan UMKM dan penjual individu di wilayah Jawa Tengah & DIY.</p>
+                <p className="text-gray-600">Fokus utama kami adalah memberdayakan UMKM dan penjual individu di seluruh Indonesia.</p>
               </div>
             </div>
           </Container>

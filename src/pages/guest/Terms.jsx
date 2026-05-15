@@ -32,7 +32,7 @@ const Terms = () => {
             <section>
               <h2 className="text-xl font-bold text-gray-900 mb-4 uppercase tracking-wider text-sm">3. Transaksi & Pembayaran</h2>
               <ul className="list-disc pl-5 space-y-2">
-                <li>Semua transaksi dilakukan melalui sistem pembayaran resmi Thriftly yang didukung oleh Midtrans.</li>
+                <li>Semua transaksi dilakukan melalui sistem pembayaran resmi Thriftly yang aman dan terpercaya.</li>
                 <li>Thriftly bertindak sebagai penengah (rekening bersama) untuk menjamin keamanan dana pembeli.</li>
                 <li>Dana akan diteruskan ke penjual hanya setelah pembeli mengonfirmasi penerimaan barang atau setelah periode otomatis berakhir (3x24 jam setelah barang sampai).</li>
               </ul>

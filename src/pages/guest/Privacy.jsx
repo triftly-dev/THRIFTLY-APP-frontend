@@ -28,7 +28,7 @@ const Privacy = () => {
               <h2 className="text-xl font-bold text-gray-900 mb-4 uppercase tracking-wider text-sm">2. Penggunaan Informasi</h2>
               <p>Kami menggunakan informasi tersebut untuk:</p>
               <ul className="list-disc pl-5 space-y-2 mt-2">
-                <li>Memproses transaksi Anda melalui Midtrans.</li>
+                <li>Memproses transaksi Anda secara aman.</li>
                 <li>Melakukan verifikasi identitas untuk mencegah penipuan.</li>
                 <li>Memberikan dukungan pelanggan.</li>
                 <li>Mengirimkan notifikasi terkait status pesanan.</li>

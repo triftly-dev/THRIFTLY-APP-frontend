@@ -14,10 +14,10 @@ const Footer = () => {
               <span className="text-2xl font-bold text-gray-900 tracking-tight">Thriftly</span>
             </Link>
             <p className="text-gray-600 leading-relaxed mb-8 max-w-sm">
-              Marketplace barang bekas terpercaya di Jawa Tengah & DIY. Jual beli barang bekas jadi lebih mudah, aman, dan pastinya cuan!
+              Marketplace barang bekas terpercaya di Indonesia. Jual beli barang bekas jadi lebih mudah, aman, dan pastinya cuan!
             </p>
             <div className="flex space-x-4">
-              <a href="https://instagram.com/thriftly" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-primary-600 hover:border-primary-200 hover:bg-primary-50 transition-all shadow-sm">
+              <a href="https://instagram.com/thriftlymarketplace" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-primary-600 hover:border-primary-200 hover:bg-primary-50 transition-all shadow-sm">
                 <Instagram size={18} />
               </a>
             </div>
@@ -79,7 +79,7 @@ const Footer = () => {
 
         <div className="border-t border-gray-200 pt-8 flex flex-col justify-center items-center gap-4 text-center">
           <div className="flex space-x-6 text-sm text-gray-500 mb-2">
-            <span>Pembayaran Aman by Midtrans</span>
+            <span>Pembayaran Aman</span>
             <span>Penjual Terverifikasi</span>
             <span>Pengiriman Cepat</span>
           </div>

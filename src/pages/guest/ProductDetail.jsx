@@ -350,7 +350,7 @@ const ProductDetail = () => {
                     </div>
                     <div>
                       <h4 className="font-medium text-gray-900">Opsi Pengiriman</h4>
-                      <p className="text-sm text-gray-500">Bisa kirim ke seluruh Jawa Tengah & DIY.</p>
+                      <p className="text-sm text-gray-500">Bisa kirim ke seluruh Indonesia.</p>
                     </div>
                   </div>
                 </div>
