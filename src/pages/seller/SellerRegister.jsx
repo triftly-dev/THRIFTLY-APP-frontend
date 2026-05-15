@@ -19,7 +19,6 @@ const SellerRegister = () => {
   const { register: registerUser } = useAuth()
   const [loading, setLoading] = useState(false)
   const [ktpPreview, setKtpPreview] = useState(null)
-  const [ktpFile, setKtpFile] = useState(null)
 
   const {
     register,
@@ -37,7 +36,6 @@ const SellerRegister = () => {
     try {
       const watermarkedImage = await addWatermarkToImage(file)
       setKtpPreview(watermarkedImage)
-      setKtpFile(watermarkedImage)
       setValue('ktpUrl', watermarkedImage)
       toast.success('Foto KTP berhasil diupload dan diberi watermark!')
     } catch (error) {
