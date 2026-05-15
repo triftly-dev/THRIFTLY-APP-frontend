@@ -302,7 +302,18 @@ const MyOrders = () => {
           
           {cancelType === 'reason' && (
             <div className="space-y-2">
-              {['Ingin merubah alamat pengiriman', 'Ingin merubah metode pembayaran', 'Menemukan harga yang lebih murah', 'Berubah pikiran / Tidak ingin beli lagi'].map((reason) => (
+              {[
+                'Ingin merubah alamat pengiriman', 
+                'Ingin merubah metode pembayaran', 
+                'Menemukan harga yang lebih murah', 
+                'Berubah pikiran / Tidak ingin beli lagi'
+              ].filter(reason => {
+                // Sembunyikan alasan ganti metode pembayaran jika sudah dibayar
+                if (reason === 'Ingin merubah metode pembayaran' && (orderToCancel?.status === 'paid' || orderToCancel?.status === 'settlement')) {
+                  return false
+                }
+                return true
+              }).map((reason) => (
                 <label key={reason} className="flex items-center gap-3 p-3 border border-gray-100 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
                   <input 
                     type="radio" 
