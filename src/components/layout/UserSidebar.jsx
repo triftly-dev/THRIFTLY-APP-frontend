@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Package, ShoppingBag, User, Settings, CreditCard } from 'lucide-react'
+import { LayoutDashboard, Package, User, Settings } from 'lucide-react'
 
 const UserSidebar = () => {
   const location = useLocation()
@@ -7,8 +7,6 @@ const UserSidebar = () => {
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/user/dashboard' },
     { icon: Package, label: 'Pesanan Saya', path: '/user/pesanan' },
-    { icon: ShoppingBag, label: 'Mulai Belanja', path: '/products' },
-    { icon: CreditCard, label: 'Pembayaran', path: '/user/pesanan' },
     { icon: User, label: 'Profil Saya', path: '/user/dashboard' },
     { icon: Settings, label: 'Pengaturan', path: '/user/dashboard' },
   ]

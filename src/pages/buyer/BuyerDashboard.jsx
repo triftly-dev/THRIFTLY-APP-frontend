@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
-import { Package, ShoppingBag, Settings, MapPin, CreditCard } from 'lucide-react'
+import { Package, Settings, MapPin } from 'lucide-react'
 import Header from '../../components/layout/Header'
 import Footer from '../../components/layout/Footer'
 import Container from '../../components/layout/Container'
@@ -61,7 +61,7 @@ const BuyerDashboard = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-6">
                   <Link to="/user/pesanan" className="group p-6 rounded-xl border border-gray-200 hover:border-primary-500 hover:shadow-md transition-all bg-white flex flex-col items-start gap-4">
                     <div className="bg-blue-50 p-3 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                       <Package size={24} />
@@ -72,25 +72,6 @@ const BuyerDashboard = () => {
                     </div>
                   </Link>
 
-                  <Link to="/products" className="group p-6 rounded-xl border border-gray-200 hover:border-primary-500 hover:shadow-md transition-all bg-white flex flex-col items-start gap-4">
-                    <div className="bg-emerald-50 p-3 rounded-lg text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                      <ShoppingBag size={24} />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 mb-1">Mulai Belanja</h3>
-                      <p className="text-sm text-gray-500">Eksplorasi ribuan barang bekas berkualitas.</p>
-                    </div>
-                  </Link>
-
-                  <Link to="/user/pesanan" className="group p-6 rounded-xl border border-gray-200 hover:border-primary-500 hover:shadow-md transition-all bg-white flex flex-col items-start gap-4">
-                    <div className="bg-orange-50 p-3 rounded-lg text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition-colors">
-                      <CreditCard size={24} />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 mb-1">Metode Pembayaran</h3>
-                      <p className="text-sm text-gray-500">Lihat riwayat dan status pembayaran Anda.</p>
-                    </div>
-                  </Link>
                 </div>
               </div>
 
