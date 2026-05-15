@@ -117,8 +117,8 @@ const SellerDashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           {/* Wallet Section */}
           <div className="lg:col-span-1">
-            <div className="bg-gray-900 rounded-3xl p-8 text-white relative overflow-hidden shadow-2xl">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-red-600 blur-[100px] opacity-20"></div>
+            <div className="bg-primary-900 rounded-3xl p-8 text-white relative overflow-hidden shadow-2xl">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary-400 blur-[100px] opacity-20"></div>
               <h2 className="text-lg font-medium opacity-70 mb-1">Saldo Penjual</h2>
               <h3 className="text-4xl font-bold mb-8">{formatCurrency(user?.saldo?.bisaDitarik || 0)}</h3>
               
@@ -129,7 +129,7 @@ const SellerDashboard = () => {
                 </div>
               </div>
 
-              <Button variant="success" fullWidth className="rounded-2xl py-4 font-bold text-lg">
+              <Button fullWidth className="bg-white text-primary-600 hover:bg-gray-50 border-none rounded-2xl py-4 font-bold text-lg">
                 Tarik Saldo
               </Button>
             </div>
@@ -164,32 +164,6 @@ const SellerDashboard = () => {
                   <ArrowRight size={20} className="text-gray-300 group-hover:text-primary-600 mt-1" />
                 </div>
               </Link>
-
-              <Link to="/profile" className="group">
-                <div className="p-6 bg-white rounded-3xl border border-gray-100 shadow-sm group-hover:border-primary-100 transition-all flex items-start justify-between">
-                  <div>
-                    <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-gray-600 mb-4 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
-                      <SettingsIcon size={20} />
-                    </div>
-                    <h4 className="font-bold text-gray-900">Informasi Toko</h4>
-                    <p className="text-sm text-gray-500 mt-1">Ubah alamat toko, bank, dan profil.</p>
-                  </div>
-                  <ArrowRight size={20} className="text-gray-300 group-hover:text-primary-600 mt-1" />
-                </div>
-              </Link>
-
-              <a href="https://wa.me/6282242637028" target="_blank" rel="noreferrer" className="group">
-                <div className="p-6 bg-primary-50 rounded-3xl border border-primary-100 shadow-sm hover:bg-primary-100 transition-all flex items-start justify-between">
-                  <div>
-                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-primary-600 mb-4">
-                      <Clock size={20} />
-                    </div>
-                    <h4 className="font-bold text-primary-900">Pusat Bantuan</h4>
-                    <p className="text-sm text-primary-700 mt-1">Hubungi Admin jika ada kendala.</p>
-                  </div>
-                  <ArrowRight size={20} className="text-primary-300 mt-1" />
-                </div>
-              </a>
             </div>
           </div>
         </div>

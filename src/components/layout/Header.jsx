@@ -114,7 +114,7 @@ const Header = () => {
                   <>
                     {/* Link Khusus Pembeli */}
                     <Link to="/user/dashboard" className="text-gray-600 hover:text-primary-600 font-medium transition-colors ml-4">
-                      Dasbor Belanja
+                      Dashboard Penjualan
                     </Link>
                   </>
                 )}
