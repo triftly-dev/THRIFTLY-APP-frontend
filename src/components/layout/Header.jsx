@@ -195,16 +195,8 @@ const Header = () => {
                 )}
 
                 <div className="flex items-center gap-3">
-                  <button 
-                    onClick={handleToggleMode}
-                    className={`px-3 py-1.5 text-sm font-medium rounded-full transition-colors border ${
-                      viewMode === 'seller' 
-                        ? 'bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-100' 
-                        : 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100'
-                    }`}
-                  >
-                    Beralih ke Mode {viewMode === 'buyer' ? 'Toko' : 'Belanja'}
-                  </button>
+                  {/* Mode switcher removed per user request */}
+
 
                   <div className="relative pl-4 border-l border-gray-200" ref={userMenuRef}>
                     <div className="relative group">
