@@ -17,7 +17,7 @@ const Footer = () => {
               Marketplace barang bekas terpercaya di Indonesia. Jual beli barang bekas jadi lebih mudah, aman, dan pastinya cuan!
             </p>
             <div className="flex space-x-4">
-              <a href="https://instagram.com/thriftlymarketplace" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-primary-600 hover:border-primary-200 hover:bg-primary-50 transition-all shadow-sm">
+              <a href="https://instagram.com/triftlymarketplace" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-primary-600 hover:border-primary-200 hover:bg-primary-50 transition-all shadow-sm">
                 <Instagram size={18} />
               </a>
             </div>
