@@ -48,8 +48,11 @@ const SellerRegister = () => {
     // 1. Isi alamat lengkap
     setValue('alamat', selectedData.address)
     
-    // 2. Sinkronkan ke dropdown lokasi (ALL_LOCATIONS)
-    // Cari yang namanya mirip dengan hasil reverse geocoding
+    // 2. Simpan koordinat ke field lokasi (agar masuk ke DB)
+    const coords = `${selectedData.lat},${selectedData.lng}`
+    setValue('lokasi', coords)
+    
+    // 3. Sinkronkan ke dropdown lokasi (ALL_LOCATIONS) untuk UI
     const cityName = selectedData.city?.toLowerCase() || ''
     const matchedLocation = ALL_LOCATIONS.find(loc => 
       cityName.includes(loc.nama.toLowerCase()) || 
@@ -57,25 +60,23 @@ const SellerRegister = () => {
     )
 
     if (matchedLocation) {
-      setValue('lokasi', matchedLocation.id)
       toast.success(`Lokasi disinkronkan ke: ${matchedLocation.nama}`)
-    } else {
-      toast.error('Lokasi di peta tidak ditemukan dalam daftar jangkauan kami. Silakan pilih lokasi terdekat dari dropdown.')
     }
 
-    // Tutup peta setelah konfirmasi sesuai permintaan user
+    // Tutup peta setelah konfirmasi
     setIsMapOpen(false)
   }
 
   const onSubmit = async (data) => {
     setLoading(true)
+    // Pastikan lokasi berisi koordinat lat,lng
     const result = await registerUser({
       name: data.nama,
       email: data.email,
       password: data.password,
       no_telp: data.noTelp,
       alamat: data.alamat,
-      lokasi: data.lokasi,
+      lokasi: data.lokasi, // Berisi 'lat,lng'
       date_of_birth: data.ttl,
       no_rekening: data.noRekening,
       ktp_url: data.ktpUrl,
@@ -237,44 +238,23 @@ const SellerRegister = () => {
                     <p className="text-[10px] text-gray-400 mt-2 uppercase font-bold tracking-wider">Langkah: Geser peta → Klik titik lokasi tepat → Klik tombol Konfirmasi di dalam peta</p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Lokasi (Wilayah) *
-                      </label>
-                      <select
-                        {...register('lokasi')}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white"
-                      >
-                        <option value="">Pilih Wilayah</option>
-                        <optgroup label="DI Yogyakarta">
-                          {ALL_LOCATIONS.filter(loc => loc.provinsi === 'DI Yogyakarta').map(loc => (
-                            <option key={loc.id} value={loc.id}>{loc.nama}</option>
-                          ))}
-                        </optgroup>
-                        <optgroup label="Jawa Tengah">
-                          {ALL_LOCATIONS.filter(loc => loc.provinsi === 'Jawa Tengah').map(loc => (
-                            <option key={loc.id} value={loc.id}>{loc.nama}</option>
-                          ))}
-                        </optgroup>
-                      </select>
-                      {errors.lokasi && (
-                        <p className="text-red-500 text-sm mt-1">{errors.lokasi.message}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Alamat Lengkap *
+                        Alamat Lengkap & Titik Lokasi *
                       </label>
                       <textarea
                         {...register('alamat')}
-                        rows={1}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white"
+                        rows={3}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white shadow-inner"
                         placeholder="Detail alamat (RT/RW, No. Rumah)"
                       />
                       {errors.alamat && (
                         <p className="text-red-500 text-sm mt-1">{errors.alamat.message}</p>
+                      )}
+                      <input type="hidden" {...register('lokasi')} />
+                      {errors.lokasi && (
+                        <p className="text-red-500 text-sm mt-1">Titik lokasi pada peta wajib ditentukan.</p>
                       )}
                     </div>
                   </div>
