@@ -137,8 +137,8 @@ export const AuthProvider = ({ children }) => {
     viewMode,
     toggleViewMode,
     isAuthenticated: !!user,
-    isSeller: user?.role === 'seller' || user?.role === 'admin',
-    isBuyer: user?.role === 'buyer' || user?.role === 'seller' || user?.role === 'admin',
+    isSeller: user?.role === 'seller',
+    isBuyer: user?.role === 'buyer',
     isAdmin: user?.role === 'admin'
   }), [user, loading, viewMode])
 
