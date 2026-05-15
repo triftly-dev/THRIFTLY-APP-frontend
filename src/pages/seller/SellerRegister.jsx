@@ -2,11 +2,9 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { MapPin } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { registerSellerSchema } from '../../utils/validation'
 import { addWatermarkToImage } from '../../utils/watermark'
-import { getLocationFromCoordinates } from '../../utils/geolocation'
 import Button from '../../components/common/Button'
 import MapPicker from '../../components/common/MapPicker'
 import Container from '../../components/layout/Container'
@@ -22,7 +20,6 @@ const SellerRegister = () => {
   const [loading, setLoading] = useState(false)
   const [ktpPreview, setKtpPreview] = useState(null)
   const [ktpFile, setKtpFile] = useState(null)
-  const [gettingLocation, setGettingLocation] = useState(false)
 
   const {
     register,
