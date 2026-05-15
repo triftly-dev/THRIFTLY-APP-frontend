@@ -36,7 +36,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <h3 className="font-bold text-gray-900">Email</h3>
-                  <p className="text-gray-600">support@thriftly.my.id</p>
+                  <p className="text-gray-600">triftlydev@gmail.com</p>
                 </div>
               </div>
 
@@ -46,7 +46,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <h3 className="font-bold text-gray-900">Kantor Pusat</h3>
-                  <p className="text-gray-600">Jl. Nakula Raya No. 5-11, Pendrikan Kidul, Semarang Tengah, Kota Semarang, Jawa Tengah 50131</p>
+                  <p className="text-gray-600">Jalan Ungaran, Mulyoharjo, Pemalang, Central Java, 52312</p>
                 </div>
               </div>
             </div>
