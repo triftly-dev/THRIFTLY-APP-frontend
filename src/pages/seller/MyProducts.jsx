@@ -48,6 +48,9 @@ const MyProducts = () => {
   }
 
   const getStatusBadge = (status) => {
+    // Jika status 'sold' (udah laku), tidak perlu tampilkan badge status lagi sesuai permintaan user
+    if (status === 'sold') return null;
+
     const variants = {
       pending: 'warning',
       approved: 'success',
@@ -61,8 +64,10 @@ const MyProducts = () => {
   const filteredProducts = products.filter(product => {
     const stock = product.stok ?? product.stock ?? 0;
     const isOutOfStock = stock <= 0;
-    const isApproved = product.status === 'approved';
-    const isActive = isApproved && !isOutOfStock;
+    
+    // Aktif jika status 'approved' atau 'sold' (tapi ada stok)
+    // Kecuali jika ditolak (rejected)
+    const isActive = (product.status === 'approved' || product.status === 'sold') && !isOutOfStock;
     
     return activeTab === 'aktif' ? isActive : !isActive;
   });
@@ -95,7 +100,7 @@ const MyProducts = () => {
                 : 'border-transparent text-gray-400 hover:text-gray-600'
               }`}
             >
-              Produk Aktif ({products.filter(p => p.status === 'approved' && (p.stok || p.stock || 0) > 0).length})
+              Produk Aktif ({products.filter(p => (p.status === 'approved' || p.status === 'sold') && (p.stok || p.stock || 0) > 0).length})
             </button>
             <button
               onClick={() => setActiveTab('tidak_aktif')}
@@ -105,7 +110,7 @@ const MyProducts = () => {
                 : 'border-transparent text-gray-400 hover:text-gray-600'
               }`}
             >
-              Tidak Aktif ({products.filter(p => p.status !== 'approved' || (p.stok || p.stock || 0) <= 0).length})
+              Tidak Aktif ({products.filter(p => p.status === 'rejected' || (p.stok || p.stock || 0) <= 0 || (p.status === 'pending' && (p.stok || p.stock || 0) > 0)).length})
             </button>
           </div>
 
