@@ -21,6 +21,9 @@ const EditProduct = () => {
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [hasChanges, setHasChanges] = useState(false)
+  const [showExitModal, setShowExitModal] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
   
   const { images, setImages, handleImageUpload, removeImage, isUploading } = useImageUpload({ maxFiles: 5 })
   const categories = getCategories()
@@ -31,10 +34,11 @@ const EditProduct = () => {
     kategori: '',
     kondisi: '',
     deskripsi: '',
-    lokasi: '',
     isBU: false,
     stok: 1
   })
+
+  const [initialData, setInitialData] = useState(null)
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -54,16 +58,17 @@ const EditProduct = () => {
         }
 
         setProduct(data)
-        setFormData({
+        const mappedData = {
           nama: data.nama,
           harga: data.harga.toString(),
           kategori: data.kategori,
           kondisi: data.kondisi,
           deskripsi: data.deskripsi,
-          lokasi: data.lokasi || data.location,
           isBU: data.isBU || data.is_bu || false,
           stok: data.stok || data.stock || 1
-        })
+        }
+        setFormData(mappedData)
+        setInitialData({ ...mappedData, fotos: data.fotos || [] })
         setImages(data.fotos || [])
       } catch (error) {
         toast.error('Gagal memuat data produk')
@@ -74,6 +79,38 @@ const EditProduct = () => {
 
     fetchProduct()
   }, [id, user.id, navigate, setImages])
+
+  // Cek apakah ada perubahan
+  useEffect(() => {
+    if (!initialData) return
+    
+    const isImagesChanged = JSON.stringify(images) !== JSON.stringify(initialData.fotos)
+    const isFormChanged = Object.keys(formData).some(key => formData[key] !== initialData[key])
+    
+    setHasChanges(isFormChanged || isImagesChanged)
+  }, [formData, images, initialData])
+
+  // Peringatan Browser Back / Close
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (hasChanges) {
+        e.preventDefault()
+        e.returnValue = ''
+      }
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [hasChanges])
+
+  const handleBack = () => {
+    if (hasChanges) {
+      if (window.confirm('Ada perubahan yang belum disimpan. Yakin ingin membatalkan?')) {
+        navigate('/toko/produk')
+      }
+    } else {
+      navigate('/toko/produk')
+    }
+  }
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -92,6 +129,7 @@ const EditProduct = () => {
     }
 
     setIsSubmitting(true)
+    setUploadProgress(10) // Mulai simulasi
     
     try {
       const updates = {
@@ -100,12 +138,22 @@ const EditProduct = () => {
         fotos: images,
       }
 
+      // Simulasi progress bar
+      const interval = setInterval(() => {
+        setUploadProgress(prev => (prev < 90 ? prev + 10 : prev))
+      }, 200)
+
       await productService.updateProduct(id, updates)
-      toast.success('Produk berhasil diupdate!')
-      navigate('/toko/produk')
+      
+      clearInterval(interval)
+      setUploadProgress(100)
+      
+      setTimeout(() => {
+        toast.success('Produk berhasil diupdate!')
+        navigate('/toko/produk')
+      }, 500)
     } catch (error) {
       toast.error(error.message || 'Gagal mengupdate produk')
-    } finally {
       setIsSubmitting(false)
     }
   }
@@ -135,7 +183,7 @@ const EditProduct = () => {
         <Container maxWidth="max-w-3xl">
           <div className="mb-6">
             <button 
-              onClick={() => navigate('/toko/produk')}
+              onClick={handleBack}
               className="flex items-center text-gray-600 hover:text-primary-600 font-medium transition-colors"
             >
               <ArrowLeft size={20} className="mr-2" />
@@ -288,27 +336,6 @@ const EditProduct = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Lokasi Barang <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                    <select
-                      name="lokasi"
-                      value={formData.lokasi}
-                      onChange={handleChange}
-                      required
-                      className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all bg-white"
-                    >
-                      <option value="">Pilih Lokasi</option>
-                      {ALL_LOCATIONS.map(loc => (
-                        <option key={loc.id} value={loc.id}>{loc.nama}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     Deskripsi Produk <span className="text-red-500">*</span>
                   </label>
                   <textarea
@@ -347,31 +374,55 @@ const EditProduct = () => {
               </div>
 
               <div className="pt-6 border-t border-gray-100 flex gap-4">
-                <Button 
+                <button 
                   type="button" 
-                  variant="outline" 
-                  fullWidth 
-                  onClick={() => navigate('/toko/produk')}
+                  onClick={handleBack}
+                  className="flex-1 py-3 px-6 rounded-xl border-2 border-gray-200 text-gray-600 font-bold hover:bg-gray-50 transition-all"
                 >
                   Batal
-                </Button>
-                <Button 
+                </button>
+                <button 
                   type="submit" 
-                  fullWidth 
-                  isLoading={isSubmitting || isUploading}
-                  disabled={isSubmitting || isUploading}
+                  disabled={!hasChanges || isSubmitting || isUploading}
+                  className={`flex-1 py-3 px-6 rounded-xl font-bold transition-all shadow-lg ${
+                    !hasChanges 
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none' 
+                    : 'bg-primary-600 text-white hover:bg-primary-700 shadow-primary-200'
+                  }`}
                 >
-                  Simpan Perubahan
-                </Button>
+                  {isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
+                </button>
               </div>
             </form>
           </div>
         </Container>
       </main>
 
+      {/* Progress Bar Modal */}
+      {isSubmitting && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl p-8 w-full max-w-sm text-center shadow-2xl animate-in zoom-in duration-300">
+            <div className="w-16 h-16 bg-primary-50 text-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <ShoppingBag size={32} className="animate-bounce" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Menyimpan Produk</h3>
+            <p className="text-sm text-gray-500 mb-6">Mohon tunggu sebentar, data sedang diperbarui...</p>
+            
+            {/* Progress Bar Container */}
+            <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden mb-2">
+              <div 
+                className="h-full bg-primary-600 transition-all duration-300 ease-out rounded-full"
+                style={{ width: `${uploadProgress}%` }}
+              />
+            </div>
+            <p className="text-xs font-bold text-primary-600">{uploadProgress}% Selesai</p>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   )
 }
 
-export default EditProduct
+export default EditProduct

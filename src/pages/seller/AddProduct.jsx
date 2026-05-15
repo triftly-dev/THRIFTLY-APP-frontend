@@ -249,23 +249,6 @@ const AddProduct = () => {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Lokasi *
-                  </label>
-                  <select
-                    {...register('lokasi')}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"
-                  >
-                    <option value="">Pilih Lokasi</option>
-                    {ALL_LOCATIONS.map(loc => (
-                      <option key={loc.id} value={loc.id}>{loc.nama}</option>
-                    ))}
-                  </select>
-                  {errors.lokasi && (
-                    <p className="text-red-500 text-sm mt-1">{errors.lokasi.message}</p>
-                  )}
-                </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
