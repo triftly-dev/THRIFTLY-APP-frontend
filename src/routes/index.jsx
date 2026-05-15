@@ -10,6 +10,8 @@ import LoginSuccess from '../pages/auth/LoginSuccess'
 import BuyerRegister from '../pages/buyer/BuyerRegister'
 import SellerRegister from '../pages/seller/SellerRegister'
 import VerifyOTP from '../pages/auth/VerifyOTP'
+import ForgotPassword from '../pages/auth/ForgotPassword'
+import ResetPassword from '../pages/auth/ResetPassword'
 import About from '../pages/guest/About'
 import Terms from '../pages/guest/Terms'
 import Privacy from '../pages/guest/Privacy'
@@ -78,6 +80,8 @@ const AppRoutes = () => {
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/help" element={<Contact />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       {/* --- Rute untuk aktifitas pembeli --- */}
       <Route
