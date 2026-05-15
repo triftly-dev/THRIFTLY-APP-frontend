@@ -42,7 +42,7 @@ const EditProduct = () => {
   // Blocker untuk navigasi internal (React Router)
   const blocker = useBlocker(
     ({ currentLocation, nextLocation }) =>
-      hasChanges && currentLocation.pathname !== nextLocation.pathname
+      hasChanges && !isSubmitting && currentLocation.pathname !== nextLocation.pathname
   )
 
   useEffect(() => {
@@ -211,13 +211,19 @@ const EditProduct = () => {
                 <p className="text-sm text-gray-500">Format: JPG, PNG. Maksimal 5 foto.</p>
                 
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                  {images.map((img, index) => (
-                    <div key={index} className="relative aspect-square rounded-xl overflow-hidden group border border-gray-200">
-                      <img src={img} alt={`Preview ${index}`} className="w-full h-full object-cover" />
+                  {(images || []).map((img, index) => (
+                    <div key={index} className="relative aspect-square rounded-xl overflow-hidden group border border-gray-200 bg-gray-50">
+                      {img ? (
+                        <img src={img} alt={`Preview ${index}`} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-300">
+                          <ShoppingBag size={20} />
+                        </div>
+                      )}
                       <button
                         type="button"
                         onClick={() => removeImage(index)}
-                        className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
                       >
                         <X size={14} />
                       </button>
@@ -273,7 +279,7 @@ const EditProduct = () => {
                     className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
                     placeholder="Contoh: 15000000"
                   />
-                  {formData.harga && (
+                  {formData.harga && !isNaN(parseInt(formData.harga)) && (
                     <p className="text-sm text-gray-500 mt-1">
                       Format: {formatCurrency(parseInt(formData.harga))}
                     </p>
