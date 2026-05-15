@@ -83,7 +83,7 @@ const AppRoutes = () => {
       <Route
         path="/user/dashboard"
         element={
-          <ProtectedRoute allowedRoles={['user']}>
+          <ProtectedRoute allowedRoles={['user', 'buyer', 'seller']}>
             <BuyerDashboard />
           </ProtectedRoute>
         }
@@ -91,7 +91,7 @@ const AppRoutes = () => {
       <Route
         path="/user/pesanan"
         element={
-          <ProtectedRoute allowedRoles={['user']}>
+          <ProtectedRoute allowedRoles={['user', 'buyer', 'seller']}>
             <MyOrders />
           </ProtectedRoute>
         }
@@ -99,7 +99,7 @@ const AppRoutes = () => {
       <Route
         path="/user/pembayaran"
         element={
-          <ProtectedRoute allowedRoles={['user']}>
+          <ProtectedRoute allowedRoles={['user', 'buyer', 'seller']}>
             <PaymentMethods />
           </ProtectedRoute>
         }
@@ -107,7 +107,7 @@ const AppRoutes = () => {
       <Route
         path="/checkout/:productId"
         element={
-          <ProtectedRoute allowedRoles={['user']}>
+          <ProtectedRoute allowedRoles={['user', 'buyer', 'seller']}>
             <Checkout />
           </ProtectedRoute>
         }
@@ -115,7 +115,7 @@ const AppRoutes = () => {
       <Route
         path="/payment/success/:orderId"
         element={
-          <ProtectedRoute allowedRoles={['user']}>
+          <ProtectedRoute allowedRoles={['user', 'buyer', 'seller']}>
             <PaymentDetail />
           </ProtectedRoute>
         }
@@ -241,7 +241,7 @@ const AppRoutes = () => {
       <Route
         path="/profile"
         element={
-          <ProtectedRoute allowedRoles={['user']}>
+          <ProtectedRoute allowedRoles={['user', 'buyer', 'seller']}>
             <Settings />
           </ProtectedRoute>
         }

@@ -16,9 +16,10 @@ import toast from 'react-hot-toast'
 
 const SellerRegister = () => {
   const navigate = useNavigate()
-  const { register: registerUser } = useAuth()
+  const { user, register: registerUser } = useAuth()
   const [loading, setLoading] = useState(false)
   const [ktpPreview, setKtpPreview] = useState(null)
+  const [isMapOpen, setIsMapOpen] = useState(true)
 
   const {
     register,
@@ -61,6 +62,9 @@ const SellerRegister = () => {
     } else {
       toast.error('Lokasi di peta tidak ditemukan dalam daftar jangkauan kami. Silakan pilih lokasi terdekat dari dropdown.')
     }
+
+    // Tutup peta setelah konfirmasi sesuai permintaan user
+    setIsMapOpen(false)
   }
 
   const onSubmit = async (data) => {
@@ -202,14 +206,34 @@ const SellerRegister = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Titik Lokasi Toko *
-                    </label>
-                    <div className="border border-gray-200 rounded-2xl p-4 bg-gray-50 overflow-hidden">
-                      <div className="h-[400px]">
-                        <MapPicker onSelect={handleMapSelect} />
-                      </div>
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Titik Lokasi Toko *
+                      </label>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => setIsMapOpen(!isMapOpen)}
+                      >
+                        {isMapOpen ? 'Tutup Peta' : 'Ubah Lokasi di Peta'}
+                      </Button>
                     </div>
+
+                    {isMapOpen ? (
+                      <div className="border border-gray-200 rounded-2xl p-4 bg-gray-50 overflow-hidden">
+                        <div className="h-[400px]">
+                          <MapPicker onSelect={handleMapSelect} />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-4 bg-green-50 border border-green-100 rounded-xl flex items-center gap-3">
+                        <div className="bg-green-500 text-white p-1 rounded-full">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
+                        <p className="text-sm text-green-700 font-medium">Lokasi sudah ditentukan di peta.</p>
+                      </div>
+                    )}
                     <p className="text-[10px] text-gray-400 mt-2 uppercase font-bold tracking-wider">Langkah: Geser peta → Klik titik lokasi tepat → Klik tombol Konfirmasi di dalam peta</p>
                   </div>
 
