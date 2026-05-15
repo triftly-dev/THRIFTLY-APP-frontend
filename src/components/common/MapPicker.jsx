@@ -26,9 +26,14 @@ const MapController = ({ onLocationSelect, getCurrentLocation, setMapInstance })
     if (setMapInstance) setMapInstance(map)
     if (getCurrentLocation) getCurrentLocation(map)
     
-    setTimeout(() => {
-      map.invalidateSize()
-    }, 300)
+    // Refresh twice to ensure modal animation is finished
+    const timer1 = setTimeout(() => map.invalidateSize(), 100)
+    const timer2 = setTimeout(() => map.invalidateSize(), 600)
+    
+    return () => {
+      clearTimeout(timer1)
+      clearTimeout(timer2)
+    }
   }, [map])
 
   return null
@@ -119,7 +124,7 @@ const MapPicker = ({ defaultLat, defaultLng, onSelect, initialAddress }) => {
         </Button>
       </div>
       
-      <div className="flex-grow min-h-[300px] rounded-xl overflow-hidden border border-gray-300 relative z-0">
+      <div className="h-[400px] rounded-xl overflow-hidden border border-gray-300 relative z-0">
         <MapContainer 
           center={center} 
           zoom={13} 
