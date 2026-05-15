@@ -79,16 +79,10 @@ const Header = () => {
           </div>
 
           <nav className="hidden md:flex items-center space-x-6">
-            {/* Notifications */}
-            <button 
-              onClick={() => setShowNotifications(!showNotifications)}
-              className="p-2 text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-full transition-colors relative"
-            >
-              <Bell size={20} />
-              {user?.ktp_status === 'rejected' && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-              )}
-            </button>
+            {/* Beranda Link */}
+            <Link to="/" className="text-gray-600 hover:text-primary-600 font-medium transition-colors">
+              Beranda
+            </Link>
 
             {/* Messages */}
             <Link to="/messages" className="p-2 text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-full transition-colors">

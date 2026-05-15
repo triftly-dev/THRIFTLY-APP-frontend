@@ -168,36 +168,7 @@ const Homepage = () => {
         </section>
       </Container>
 
-      {/* CTA Panel */}
-      <section className="bg-gray-900 py-20 px-4 mt-auto">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">
-            Siap Berburu Barang Baru?
-          </h2>
-          <p className="text-gray-400 mb-10 max-w-2xl mx-auto text-lg">
-            Langganan newsletter kita biar nggak ketinggalan update barang-barang premium yang baru masuk.
-          </p>
-          
-          <form onSubmit={handleNewsletterSubscribe} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-            <input 
-              type="email" 
-              required
-              value={newsletterEmail}
-              onChange={(e) => setNewsletterEmail(e.target.value)}
-              placeholder="Masukin email kamu" 
-              className="flex-1 px-5 py-3.5 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-            />
-            <Button 
-              type="submit"
-              size="lg" 
-              disabled={subscribing}
-              className="rounded-xl whitespace-nowrap"
-            >
-              {subscribing ? 'Mengirim...' : 'Gas Langganan'}
-            </Button>
-          </form>
-        </div>
-      </section>
+
 
       <Footer />
     </div>
