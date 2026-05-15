@@ -482,7 +482,7 @@ const Checkout = () => {
         isOpen={showMapModal}
         onClose={() => setShowMapModal(false)}
         title="Pilih Lokasi Pengiriman"
-        maxWidth="max-w-4xl"
+        size="lg"
       >
         <div className="h-[500px]">
           <MapPicker 

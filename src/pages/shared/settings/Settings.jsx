@@ -761,7 +761,7 @@ const Settings = () => {
           <MapPicker
             defaultLat={tempAddress.lokasi ? parseFloat(tempAddress.lokasi.split(',')[0]) : null}
             defaultLng={tempAddress.lokasi ? parseFloat(tempAddress.lokasi.split(',')[1]) : null}
-            onLocationChange={(loc) => {
+            onSelect={(loc) => {
               setTempAddress({
                 ...tempAddress,
                 alamat: loc.address || tempAddress.alamat,

@@ -44,6 +44,7 @@ const MapPicker = ({ defaultLat, defaultLng, onSelect, initialAddress }) => {
   const center = [defaultLat || -6.966667, defaultLng || 110.416667]
   const [position, setPosition] = useState(defaultLat && defaultLng ? center : null)
   const [isLocating, setIsLocating] = useState(false)
+  const [isLoadingAddress, setIsLoadingAddress] = useState(false)
   const [mapInstance, setMapInstance] = useState(null)
   const [selectedData, setSelectedData] = useState({
     lat: defaultLat || center[0],
@@ -53,6 +54,7 @@ const MapPicker = ({ defaultLat, defaultLng, onSelect, initialAddress }) => {
 
   const handleLocationSelect = async (lat, lng) => {
     setPosition([lat, lng])
+    setIsLoadingAddress(true)
     try {
       const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
       const data = await res.json()
@@ -68,12 +70,14 @@ const MapPicker = ({ defaultLat, defaultLng, onSelect, initialAddress }) => {
       })
     } catch (error) {
       console.error('Failed to reverse geocode', error)
-      setSelectedData({ lat, lng, address: 'Lokasi tidak diketahui', city: '' })
+      setSelectedData({ lat, lng, address: 'Gagal mendapatkan alamat. Silakan coba titik lain.', city: '' })
+    } finally {
+      setIsLoadingAddress(false)
     }
   }
 
   const handleConfirm = () => {
-    if (onSelect) {
+    if (onSelect && selectedData.address && !isLoadingAddress) {
       onSelect(selectedData)
     }
   }
@@ -146,11 +150,12 @@ const MapPicker = ({ defaultLat, defaultLng, onSelect, initialAddress }) => {
         <div className="absolute bottom-4 right-4 z-[1000]">
           <Button 
             onClick={handleConfirm}
-            disabled={!selectedData.address}
+            disabled={!selectedData.address || isLoadingAddress}
             className="shadow-xl border-2 border-white"
             size="sm"
+            loading={isLoadingAddress}
           >
-            Konfirmasi Lokasi Ini
+            {isLoadingAddress ? 'Mencari...' : 'Konfirmasi Lokasi Ini'}
           </Button>
         </div>
       </div>
@@ -158,7 +163,11 @@ const MapPicker = ({ defaultLat, defaultLng, onSelect, initialAddress }) => {
       <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
         <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Alamat Terpilih:</p>
         <p className="text-xs text-gray-700 line-clamp-2">
-          {selectedData.address || 'Klik pada peta untuk memilih lokasi...'}
+          {isLoadingAddress ? (
+            <span className="text-primary-500 animate-pulse font-medium">Mencari alamat...</span>
+          ) : (
+            selectedData.address || 'Klik pada peta untuk memilih lokasi...'
+          )}
         </p>
       </div>
     </div>
