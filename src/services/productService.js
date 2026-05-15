@@ -32,7 +32,8 @@ export const productService = {
       harga: p.price,
       fotos: formatImages(p.images),
       isBU: p.is_bu,
-      lokasi: p.location
+      lokasi: p.location,
+      stok: p.stock // Tambahkan ini agar efek buram jalan
     }))
   },
 
@@ -46,7 +47,8 @@ export const productService = {
       fotos: formatImages(p.images),
       isBU: p.is_bu,
       sellerId: p.user_id,
-      lokasi: p.location
+      lokasi: p.location,
+      stok: p.stock // Tambahkan ini juga
     }))
   },
 
