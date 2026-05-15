@@ -98,8 +98,30 @@ const EditProduct = () => {
         e.returnValue = ''
       }
     }
+
+    const handlePopState = (e) => {
+      if (hasChanges) {
+        if (window.confirm('Ada perubahan yang belum disimpan. Yakin ingin membatalkan?')) {
+          // Allow navigation
+        } else {
+          // Stay on page
+          window.history.pushState(null, '', window.location.pathname)
+        }
+      }
+    }
+
     window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+    
+    // Trick to intercept back button
+    if (hasChanges) {
+      window.history.pushState(null, '', window.location.pathname)
+      window.addEventListener('popstate', handlePopState)
+    }
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+      window.removeEventListener('popstate', handlePopState)
+    }
   }, [hasChanges])
 
   const handleBack = () => {
@@ -147,6 +169,7 @@ const EditProduct = () => {
       
       clearInterval(interval)
       setUploadProgress(100)
+      setHasChanges(false) // Set false agar tidak kena cegat navigation blocker
       
       setTimeout(() => {
         toast.success('Produk berhasil diupdate!')

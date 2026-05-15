@@ -167,9 +167,6 @@ const MyProducts = () => {
                           </div>
                         )}
                         
-                        <div className="px-3 py-1 bg-gray-50 text-gray-500 rounded-lg text-xs font-bold border border-gray-100">
-                          ID: #{product.id}
-                        </div>
                       </div>
                       
                       {product.adminNote && (
