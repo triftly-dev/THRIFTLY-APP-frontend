@@ -53,7 +53,8 @@ const MyProducts = () => {
       approved: 'success',
       rejected: 'danger'
     }
-    return <Badge variant={variants[status]}>{STATUS[status]}</Badge>
+    const variant = variants[status] || 'info'
+    return <Badge variant={variant}>{STATUS[status] || status}</Badge>
   }
 
   const filteredProducts = products.filter(product => {
@@ -115,12 +116,18 @@ const MyProducts = () => {
               filteredProducts.map((product) => (
                 <div key={product.id} className="bg-white rounded-2xl p-4 md:p-6 shadow-soft border border-gray-100 hover:shadow-md transition-all group">
                   <div className="flex flex-col md:flex-row gap-6">
-                    <div className="relative w-full md:w-40 h-40 shrink-0">
-                      <img
-                        src={product.fotos[0]}
-                        alt={product.nama}
-                        className="w-full h-full object-cover rounded-xl"
-                      />
+                    <div className="relative w-full md:w-40 h-40 shrink-0 bg-gray-100 rounded-xl overflow-hidden">
+                      {product.fotos && product.fotos.length > 0 ? (
+                        <img
+                          src={product.fotos[0]}
+                          alt={product.nama}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                          <ShoppingBag size={24} />
+                        </div>
+                      )}
                       {product.isBU && (
                         <div className="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-lg shadow-sm">
                           BUTUH UANG
@@ -149,7 +156,7 @@ const MyProducts = () => {
                           </div>
                         </div>
                         <p className="text-2xl font-black text-primary-700">
-                          {formatCurrency(product.harga)}
+                          {formatCurrency(product.harga || 0)}
                         </p>
                       </div>
                       
