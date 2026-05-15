@@ -61,7 +61,8 @@ const Checkout = () => {
   // Load Midtrans Snap Script
   useEffect(() => {
     const midtransScriptUrl = "https://app.sandbox.midtrans.com/snap/snap.js";
-    const myMidtransClientKey = import.meta.env.VITE_MIDTRANS_CLIENT_KEY;
+    // Hardcoded Client Key dari akun pamungkasbagas691@gmail.com untuk mempermudah audit
+    const myMidtransClientKey = "Mid-client-oS2Im80ew_fyc3RE";
 
     let scriptTag = document.createElement('script');
     scriptTag.src = midtransScriptUrl;
