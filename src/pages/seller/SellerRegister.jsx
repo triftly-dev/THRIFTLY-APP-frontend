@@ -210,7 +210,7 @@ const SellerRegister = () => {
                         <MapPicker onSelect={handleMapSelect} />
                       </div>
                     </div>
-                    <p className="text-[10px] text-gray-400 mt-2 uppercase font-bold tracking-wider">Langkah: Geser peta > Klik titik lokasi tepat > Klik tombol Konfirmasi di dalam peta</p>
+                    <p className="text-[10px] text-gray-400 mt-2 uppercase font-bold tracking-wider">Langkah: Geser peta → Klik titik lokasi tepat → Klik tombol Konfirmasi di dalam peta</p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
