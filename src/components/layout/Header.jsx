@@ -84,11 +84,7 @@ const Header = () => {
               Beranda
             </Link>
 
-            {/* Messages */}
-            <Link to="/messages" className="p-2 text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-full transition-colors">
-              <MessageCircle size={20} />
-            </Link>
-            
+
             {!user && (
               <div className="flex items-center space-x-3">
                 <Link to="/login">
